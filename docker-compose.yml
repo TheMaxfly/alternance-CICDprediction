@@ -1,0 +1,68 @@
+services:
+
+  # ── PostgreSQL (backend MLflow + futur stockage donnees) ──────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-briefml}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGEME}
+      POSTGRES_DB: ${POSTGRES_DB:-mlflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-briefml}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── MLflow Tracking Server ───────────────────────────────────────────
+  mlflow:
+    build:
+      context: .
+      dockerfile: mlflow.Dockerfile
+    environment:
+      MLFLOW_BACKEND_STORE_URI: postgresql://${POSTGRES_USER:-briefml}:${POSTGRES_PASSWORD:-CHANGEME}@postgres:5432/${POSTGRES_DB:-mlflow}
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_artifacts:/mlflow/artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── API FastAPI (prediction CatBoost) ────────────────────────────────
+  api:
+    build:
+      context: .
+      target: api
+    environment:
+      MODEL_PATH: /app/model/catboost_product15_v2_time_bucket_final.cbm
+      META_PATH: /app/out/catboost_product15_v2_time_bucket_final_meta.json
+      MISSING_CAT: ${MISSING_CAT:-__MISSING__}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  # ── Streamlit (interface utilisateur) ────────────────────────────────
+  streamlit:
+    build:
+      context: .
+      target: streamlit
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  mlflow_artifacts:
