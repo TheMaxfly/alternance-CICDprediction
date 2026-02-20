@@ -64,6 +64,10 @@ pythonVersion = "3.12"
 include = ["briefml"]
 exclude = ["tests", ".venv"]
 typeCheckingMode = "basic"
+# models.py uses 'int' as a Pydantic field name (ML feature name), which shadows
+# the Python builtin. These rules are disabled to accommodate this API constraint.
+reportInvalidTypeForm = "none"
+reportGeneralTypeIssues = "none"
 
 [tool.bandit]
 exclude_dirs = ["tests", ".venv"]

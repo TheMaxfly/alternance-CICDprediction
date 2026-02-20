@@ -262,7 +262,7 @@ def generate_recap_table(
         Sorted by page number for logical display
     """
     if not prediction_inputs:
-        return pd.DataFrame(columns=["Champ", "Code", "Libellé", "Page"])
+        return pd.DataFrame(columns=["Champ", "Code", "Libellé", "Page"])  # type: ignore[call-overload]
 
     rows = []
 

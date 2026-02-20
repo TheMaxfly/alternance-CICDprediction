@@ -120,7 +120,7 @@ def normalize_input(payload: dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
             payload[c] = DEFAULTS[c]
 
     row = {c: payload.get(c, np.nan) for c in meta.features}
-    X = pd.DataFrame([row], columns=meta.features).replace({pd.NA: np.nan})
+    X = pd.DataFrame([row], columns=meta.features).replace({pd.NA: np.nan})  # type: ignore[call-overload]
 
     # catégorielles -> str + token manquant
     for c in meta.cat_features:
@@ -144,7 +144,7 @@ def normalize_input(payload: dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
                     },
                 )
             try:
-                X[c] = pd.to_numeric(X[c], errors="raise").astype(float)
+                X[c] = pd.to_numeric(X[c], errors="raise").astype(float)  # type: ignore[union-attr]
             except Exception as err:
                 raise HTTPException(
                     status_code=422,

@@ -65,7 +65,7 @@ jobs:
         run: uv run bandit -r briefml/ -c pyproject.toml
 
       - name: Safety dependency check
-        run: uv run safety check
+        run: uv run safety scan --output screen
         env:
           SAFETY_API_KEY: ${{ secrets.SAFETY_API_KEY }}
 

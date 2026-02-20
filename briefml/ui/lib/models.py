@@ -23,13 +23,13 @@ class PredictionInput(BaseModel):
     dep: str = Field(
         ..., description="Département (code INSEE, ex: '59', '75', '2A', '971')"
     )
-    lum: int = Field(..., ge=1, le=5, description="Conditions d'éclairage (1-5)")
-    atm: int = Field(..., description="Conditions atmosphériques (-1 ou 1-9)")
-    catr: int = Field(..., description="Catégorie de route (1-7, 9)")
-    agg: int = Field(..., ge=1, le=2, description="Agglomération (1=hors, 2=en)")
-    int: int = Field(..., ge=1, le=9, description="Type d'intersection (1-9)")
-    circ: int = Field(..., description="Régime de circulation (-1 ou 1-4)")
-    col: int = Field(..., description="Type de collision (-1 ou 1-7)")
+    lum: int = Field(..., ge=1, le=5, description="Conditions d'éclairage (1-5)")  # type: ignore[reportGeneralTypeIssues]
+    atm: int = Field(..., description="Conditions atmosphériques (-1 ou 1-9)")  # type: ignore[reportGeneralTypeIssues]
+    catr: int = Field(..., description="Catégorie de route (1-7, 9)")  # type: ignore[reportGeneralTypeIssues]
+    agg: int = Field(..., ge=1, le=2, description="Agglomération (1=hors, 2=en)")  # type: ignore[reportGeneralTypeIssues]
+    int: int = Field(..., ge=1, le=9, description="Type d'intersection (1-9)")  # type: ignore[reportGeneralTypeIssues]
+    circ: int = Field(..., description="Régime de circulation (-1 ou 1-4)")  # type: ignore[reportGeneralTypeIssues]
+    col: int = Field(..., description="Type de collision (-1 ou 1-7)")  # type: ignore[reportGeneralTypeIssues]
     vma_bucket: str = Field(..., description="Classe de vitesse maximale autorisée")
     catv_family_4: str = Field(..., description="Famille de véhicule (4 classes)")
     manv_mode: int = Field(..., ge=-1, le=26, description="Manœuvre (-1 ou 0-26)")

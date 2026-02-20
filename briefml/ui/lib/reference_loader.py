@@ -214,7 +214,7 @@ def get_field_help(
     if field_name not in reference_data:
         return None
 
-    help_texts = reference_data.get("help_texts", {})
+    help_texts: dict[str, str] = reference_data.get("help_texts", {})  # type: ignore[assignment]
     definition = help_texts.get(field_name, "")
 
     if not definition:
