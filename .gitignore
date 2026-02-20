@@ -28,3 +28,6 @@ notebooks/
 
 # Local AI agent tooling (not needed in repo)
 .claude/
+
+# MkDocs generated site
+site/

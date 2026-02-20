@@ -1,0 +1,56 @@
+site_name: BriefML — Prédiction d'accidentologie
+site_description: API de prédiction de la gravité des accidents de la route (CatBoost + FastAPI + Streamlit)
+site_author: TheMaxfly
+site_url: https://themaxfly.github.io/alternance-CICDprediction
+
+repo_name: TheMaxfly/alternance-CICDprediction
+repo_url: https://github.com/TheMaxfly/alternance-CICDprediction
+
+theme:
+  name: material
+  language: fr
+  palette:
+    - scheme: default
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Mode sombre
+    - scheme: slate
+      primary: deep orange
+      accent: orange
+      toggle:
+        icon: material/brightness-4
+        name: Mode clair
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: fr
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            show_category_heading: true
+            docstring_style: google
+
+nav:
+  - Accueil: index.md
+  - Démarrage: getting-started.md
+  - API:
+      - Prédicteur: api/predictor.md
+  - Référence:
+      - Dictionnaire API: api_dictionary.md
+      - Dictionnaire des données: data_dictionary.md
+  - CI/CD: cicd.md
+  - Changelog: changelog.md
