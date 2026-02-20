@@ -40,7 +40,8 @@ jobs:
           images: ${{ env.IMAGE_BASE }}-api
           tags: |
             type=ref,event=branch
-            type=sha,prefix={{branch}}-,format=short
+            type=ref,event=pr
+            type=sha,prefix=git-,format=short
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push API image
@@ -84,7 +85,8 @@ jobs:
           images: ${{ env.IMAGE_BASE }}-streamlit
           tags: |
             type=ref,event=branch
-            type=sha,prefix={{branch}}-,format=short
+            type=ref,event=pr
+            type=sha,prefix=git-,format=short
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
       - name: Build and push Streamlit image
