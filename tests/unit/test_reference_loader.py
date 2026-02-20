@@ -8,7 +8,7 @@ Tests:
 """
 
 import pytest
-from streamlit_lib.reference_loader import load_reference_data, get_field_help
+from briefml.ui.lib.reference_loader import load_reference_data, get_field_help
 
 
 class TestUS09FieldHelp:

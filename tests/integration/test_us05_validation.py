@@ -8,7 +8,7 @@ Tests verify that:
 """
 
 import pytest
-from streamlit_lib import session_state, validation
+from briefml.ui.lib import session_state, validation
 
 
 pytestmark = pytest.mark.integration

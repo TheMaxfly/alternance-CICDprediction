@@ -5,7 +5,7 @@ Fields: dep, agg, catr, vma_bucket
 """
 
 import streamlit as st
-from streamlit_lib import session_state, reference_loader
+from briefml.ui.lib import session_state, reference_loader
 
 
 def render():

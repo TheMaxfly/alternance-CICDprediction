@@ -5,7 +5,7 @@ Fields: driver_age_bucket, driver_trajet_family, catv_family_4
 """
 
 import streamlit as st
-from streamlit_lib import session_state, reference_loader
+from briefml.ui.lib import session_state, reference_loader
 
 
 def render():

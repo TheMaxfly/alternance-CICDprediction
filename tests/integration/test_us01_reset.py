@@ -17,7 +17,7 @@ import streamlit as st
 
 
 # Import the modules we're testing
-from streamlit_lib import session_state, reference_loader
+from briefml.ui.lib import session_state, reference_loader
 
 
 class TestUS01Reset:

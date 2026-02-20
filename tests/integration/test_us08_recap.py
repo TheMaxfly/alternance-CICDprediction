@@ -9,7 +9,7 @@ Tests verify that:
 
 import pytest
 import pandas as pd
-from streamlit_lib import session_state, reference_loader
+from briefml.ui.lib import session_state, reference_loader
 
 
 pytestmark = pytest.mark.integration

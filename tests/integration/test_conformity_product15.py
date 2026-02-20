@@ -9,7 +9,7 @@ Validates:
 """
 
 import pytest
-from streamlit_lib.reference_loader import load_reference_data, get_dropdown_options
+from briefml.ui.lib.reference_loader import load_reference_data, get_dropdown_options
 
 pytestmark = pytest.mark.integration
 

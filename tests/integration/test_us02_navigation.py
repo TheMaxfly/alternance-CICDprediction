@@ -15,7 +15,7 @@ Following TDD: These tests MUST FAIL before implementation.
 import pytest
 from unittest.mock import MagicMock, patch
 
-from streamlit_lib import session_state
+from briefml.ui.lib import session_state
 
 
 class TestUS02Navigation:
@@ -202,7 +202,7 @@ class TestUS02Navigation:
         When: Loading field options
         Then: All fields should have discrete options (suitable for dropdowns)
         """
-        from streamlit_lib import reference_loader
+        from briefml.ui.lib import reference_loader
 
         # Load reference data
         ref_data = reference_loader.load_reference_data()

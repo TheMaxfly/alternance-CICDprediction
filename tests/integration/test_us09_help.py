@@ -5,7 +5,7 @@ Tests that each page's fields have help text available via get_field_help().
 """
 
 import pytest
-from streamlit_lib.reference_loader import load_reference_data, get_field_help
+from briefml.ui.lib.reference_loader import load_reference_data, get_field_help
 
 pytestmark = pytest.mark.integration
 

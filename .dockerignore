@@ -4,6 +4,7 @@
 .specify/
 .codex/
 __pycache__/
+briefml/__pycache__/
 *.py[oc]
 *.egg-info/
 notebooks/

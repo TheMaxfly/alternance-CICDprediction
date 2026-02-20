@@ -9,7 +9,7 @@ Tests verify that:
 
 import pytest
 from unittest.mock import patch, MagicMock
-from streamlit_lib import api_client
+from briefml.ui.lib import api_client
 
 
 class TestUS07Prediction:

@@ -5,7 +5,7 @@ Shows summary of all 15 fields and prediction button
 """
 
 import streamlit as st
-from streamlit_lib import session_state, reference_loader, validation, api_client
+from briefml.ui.lib import session_state, reference_loader, validation, api_client
 
 
 def render():

@@ -5,14 +5,14 @@ This is the main entry point for the Streamlit interface.
 It provides a multi-page form to collect 15 input variables and call the FastAPI prediction endpoint.
 
 Architecture:
-- Uses streamlit_lib modules for session state, validation, and API calls
+- Uses briefml.ui.lib modules for session state, validation, and API calls
 - Loads reference data from data/ref_options.json
 - Implements constitution principle III (API-First)
 """
 
 import logging
 import streamlit as st
-from streamlit_lib import reference_loader, session_state
+from briefml.ui.lib import reference_loader, session_state
 
 # Configure logging (T095)
 logging.basicConfig(
@@ -88,12 +88,12 @@ st.caption("Interface Streamlit pour la prediction de la gravite des accidents d
 
 # Import page render functions (numeric-prefixed filenames require importlib)
 import importlib
-_page1 = importlib.import_module("streamlit_pages.1_Contexte_Route")
-_page2 = importlib.import_module("streamlit_pages.2_Infrastructure")
-_page3 = importlib.import_module("streamlit_pages.3_Collision")
-_page4 = importlib.import_module("streamlit_pages.4_Conducteur")
-_page5 = importlib.import_module("streamlit_pages.5_Conditions")
-_page6 = importlib.import_module("streamlit_pages.6_Recap_Prediction")
+_page1 = importlib.import_module("briefml.ui.pages.1_Contexte_Route")
+_page2 = importlib.import_module("briefml.ui.pages.2_Infrastructure")
+_page3 = importlib.import_module("briefml.ui.pages.3_Collision")
+_page4 = importlib.import_module("briefml.ui.pages.4_Conducteur")
+_page5 = importlib.import_module("briefml.ui.pages.5_Conditions")
+_page6 = importlib.import_module("briefml.ui.pages.6_Recap_Prediction")
 
 # Display current page content
 if current_page == 1:

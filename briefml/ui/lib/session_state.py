@@ -12,14 +12,14 @@ This module provides helper functions to:
 from typing import Any
 import streamlit as st
 import pandas as pd
-from streamlit_lib import validation, reference_loader
+from briefml.ui.lib import validation, reference_loader
 
 
 def initialize_state(reference_data: dict[str, list[dict[str, Any]]]) -> None:
     """
     Initialize Streamlit session state with default values.
 
-    Should be called once at app startup (in streamlit_app.py).
+    Should be called once at app startup (in app.py).
 
     Args:
         reference_data: Loaded reference data from reference_loader
@@ -246,32 +246,23 @@ def generate_recap_table(prediction_inputs: dict[str, Any], reference_data: dict
         DataFrame with columns: Champ, Code, Libellé, Page
         Sorted by page number for logical display
     """
-    # If empty inputs, return empty DataFrame with correct columns
     if not prediction_inputs:
         return pd.DataFrame(columns=["Champ", "Code", "Libellé", "Page"])
 
     rows = []
 
-    # Iterate through filled fields
     for field_name, field_value in prediction_inputs.items():
-        # Skip None values
         if field_value is None:
             continue
 
-        # Get French label for field
         field_label = validation.get_field_label(field_name)
-
-        # Get page number
         page_number = validation.get_field_page(field_name)
 
-        # Get label for the code value from reference data
         try:
             value_label = reference_loader.get_label_for_code(reference_data, field_name, field_value)
         except (KeyError, ValueError):
-            # Fallback to just showing the value if label not found
             value_label = str(field_value)
 
-        # Add row to table (Code as str to avoid Arrow mixed-type error)
         rows.append({
             "Champ": field_label,
             "Code": str(field_value),
@@ -279,10 +270,8 @@ def generate_recap_table(prediction_inputs: dict[str, Any], reference_data: dict
             "Page": page_number
         })
 
-    # Create DataFrame
     df = pd.DataFrame(rows)
 
-    # Sort by page number for logical display
     if not df.empty:
         df = df.sort_values(by="Page", ignore_index=True)
 

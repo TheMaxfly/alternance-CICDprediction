@@ -12,7 +12,7 @@ import json
 from unittest.mock import patch, MagicMock
 
 import pytest
-from streamlit_lib.api_client import call_predict_api
+from briefml.ui.lib.api_client import call_predict_api
 
 
 # Sample valid inputs for testing
@@ -38,7 +38,7 @@ SAMPLE_INPUTS = {
 class TestUS12Logging:
     """Tests for prediction API logging (metadata only)."""
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_successful_call_logs_metadata(self, mock_post, caplog):
         """Successful API call logs status_code and response_time_ms."""
         mock_response = MagicMock()
@@ -50,7 +50,7 @@ class TestUS12Logging:
         }
         mock_post.return_value = mock_response
 
-        with caplog.at_level(logging.INFO, logger="streamlit_lib.api_client"):
+        with caplog.at_level(logging.INFO, logger="briefml.ui.lib.api_client"):
             call_predict_api(SAMPLE_INPUTS)
 
         # Should log at least one message with status and timing
@@ -59,7 +59,7 @@ class TestUS12Logging:
         assert "200" in log_message
         assert "ms" in log_message.lower()
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_error_call_logs_error_metadata(self, mock_post, caplog):
         """Error API call logs status_code."""
         mock_response = MagicMock()
@@ -68,27 +68,27 @@ class TestUS12Logging:
         mock_response.json.return_value = {"detail": "Internal error"}
         mock_post.return_value = mock_response
 
-        with caplog.at_level(logging.INFO, logger="streamlit_lib.api_client"):
+        with caplog.at_level(logging.INFO, logger="briefml.ui.lib.api_client"):
             call_predict_api(SAMPLE_INPUTS)
 
         assert len(caplog.records) >= 1
         log_message = caplog.text
         assert "500" in log_message
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_timeout_logs_timeout_error(self, mock_post, caplog):
         """Timeout is logged as an error."""
         from requests.exceptions import Timeout
         mock_post.side_effect = Timeout("Connection timed out")
 
-        with caplog.at_level(logging.INFO, logger="streamlit_lib.api_client"):
+        with caplog.at_level(logging.INFO, logger="briefml.ui.lib.api_client"):
             call_predict_api(SAMPLE_INPUTS)
 
         assert len(caplog.records) >= 1
         log_message = caplog.text.lower()
         assert "timeout" in log_message
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_no_user_data_in_logs(self, mock_post, caplog):
         """Logs must NOT contain user input data (field values)."""
         mock_response = MagicMock()
@@ -100,7 +100,7 @@ class TestUS12Logging:
         }
         mock_post.return_value = mock_response
 
-        with caplog.at_level(logging.DEBUG, logger="streamlit_lib.api_client"):
+        with caplog.at_level(logging.DEBUG, logger="briefml.ui.lib.api_client"):
             call_predict_api(SAMPLE_INPUTS)
 
         log_text = caplog.text
@@ -112,7 +112,7 @@ class TestUS12Logging:
             assert str(field_value) not in log_text or field_name not in log_text, \
                 f"User data '{field_name}={field_value}' found in logs"
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_log_contains_response_time(self, mock_post, caplog):
         """Log includes response time in milliseconds."""
         mock_response = MagicMock()
@@ -124,14 +124,14 @@ class TestUS12Logging:
         }
         mock_post.return_value = mock_response
 
-        with caplog.at_level(logging.INFO, logger="streamlit_lib.api_client"):
+        with caplog.at_level(logging.INFO, logger="briefml.ui.lib.api_client"):
             call_predict_api(SAMPLE_INPUTS)
 
         log_message = caplog.text
         # Should mention response time
         assert "response_time" in log_message.lower() or "ms" in log_message.lower()
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_422_logs_validation_error(self, mock_post, caplog):
         """422 validation error is logged with status code."""
         mock_response = MagicMock()
@@ -141,7 +141,7 @@ class TestUS12Logging:
         }
         mock_post.return_value = mock_response
 
-        with caplog.at_level(logging.INFO, logger="streamlit_lib.api_client"):
+        with caplog.at_level(logging.INFO, logger="briefml.ui.lib.api_client"):
             call_predict_api(SAMPLE_INPUTS)
 
         log_message = caplog.text

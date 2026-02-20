@@ -1,16 +1,16 @@
 """
-predictor.py — API FastAPI pour prédire la gravité d’un accident (CatBoost product15_v2_time_bucket)
+predictor.py — API FastAPI pour prédire la gravité d'un accident (CatBoost product15_v2_time_bucket)
 
 - Charge un modèle CatBoost (.cbm) et un meta.json (features, cat_features, threshold)
 - Valide / normalise les 15 champs utilisateur
 - Retourne proba + pred_class + label
 
 Lancement :
-  uvicorn predictor:app --host 0.0.0.0 --port 8000 --reload
+  uvicorn briefml.api.predictor:app --host 0.0.0.0 --port 8000 --reload
 
 Variables d'environnement (optionnelles) :
-  MODEL_PATH=/home/maxime/alternance/BriefML/model/catboost_product15_v2_time_bucket_final.cbm
-  META_PATH=/home/maxime/alternance/BriefML/out/catboost_product15_v2_time_bucket_final_meta.json
+  MODEL_PATH=/app/model/catboost_product15_v2_time_bucket_final.cbm
+  META_PATH=/app/artifacts/catboost_product15_v2_time_bucket_final_meta.json
   MISSING_CAT=__MISSING__
 """
 
@@ -33,13 +33,11 @@ from pydantic import BaseModel, Field
 # Config / Meta
 # -----------------------------
 
-BASE_DIR = Path(__file__).resolve().parent
+# Remonte de briefml/api/ → briefml/ → racine du projet
+BASE_DIR = Path(__file__).resolve().parents[2]
 
-# Default project layout:
-# - model/ contains the CatBoost .cbm
-# - out/ contains the meta.json (features, cat_features, threshold)
 DEFAULT_MODEL_PATH = str(BASE_DIR / "model" / "catboost_product15_v2_time_bucket_final.cbm")
-DEFAULT_META_PATH = str(BASE_DIR / "out" / "catboost_product15_v2_time_bucket_final_meta.json")
+DEFAULT_META_PATH = str(BASE_DIR / "artifacts" / "catboost_product15_v2_time_bucket_final_meta.json")
 MISSING_CAT = os.getenv("MISSING_CAT", "__MISSING__")
 
 

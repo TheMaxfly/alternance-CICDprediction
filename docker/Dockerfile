@@ -23,12 +23,11 @@ COPY pyproject.toml ./
 RUN uv pip install --system --no-cache -r pyproject.toml
 
 # Copier le code source
-COPY predictor.py start.py streamlit_app.py ./
-COPY streamlit_lib/ ./streamlit_lib/
-COPY streamlit_pages/ ./streamlit_pages/
+COPY briefml/ ./briefml/
+COPY scripts/ ./scripts/
 COPY model/ ./model/
 COPY data/ ./data/
-COPY out/ ./out/
+COPY artifacts/ ./artifacts/
 
 # --------------- Stage 2: API FastAPI ---------------
 FROM base AS api
@@ -38,7 +37,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
-CMD ["python", "-m", "uvicorn", "predictor:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "uvicorn", "briefml.api.predictor:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # --------------- Stage 3: Streamlit ---------------
 FROM base AS streamlit
@@ -48,7 +47,7 @@ EXPOSE 8501
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8501/_stcore/health || exit 1
 
-CMD ["python", "-m", "streamlit", "run", "streamlit_app.py", \
+CMD ["python", "-m", "streamlit", "run", "briefml/ui/app.py", \
      "--server.port=8501", \
      "--server.address=0.0.0.0", \
      "--server.headless=true", \

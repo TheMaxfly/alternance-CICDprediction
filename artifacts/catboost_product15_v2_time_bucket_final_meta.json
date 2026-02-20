@@ -1,0 +1,50 @@
+{
+  "model_name": "catboost_product15_v2_time_bucket_final",
+  "created_at": "2026-01-30T17:50:34",
+  "threshold": 0.47,
+  "features": [
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket"
+  ],
+  "cat_features": [
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket"
+  ],
+  "catboost_params": {
+    "depth": 5,
+    "learning_rate": 0.023227316785394195,
+    "l2_leaf_reg": 0.055467338800778004,
+    "random_strength": 5.953804363406876,
+    "bagging_temperature": 1.10434276499118,
+    "border_count": 114,
+    "subsample": 0.9360904372035957,
+    "rsm": 0.8799642206944849,
+    "iterations": 5960
+  }
+}

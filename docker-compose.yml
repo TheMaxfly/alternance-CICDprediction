@@ -21,7 +21,7 @@ services:
   mlflow:
     build:
       context: .
-      dockerfile: mlflow.Dockerfile
+      dockerfile: docker/mlflow.Dockerfile
     environment:
       MLFLOW_BACKEND_STORE_URI: postgresql://${POSTGRES_USER:-briefml}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mlflow}
     ports:
@@ -36,10 +36,11 @@ services:
   api:
     build:
       context: .
+      dockerfile: docker/Dockerfile
       target: api
     environment:
       MODEL_PATH: /app/model/catboost_product15_v2_time_bucket_final.cbm
-      META_PATH: /app/out/catboost_product15_v2_time_bucket_final_meta.json
+      META_PATH: /app/artifacts/catboost_product15_v2_time_bucket_final_meta.json
       MISSING_CAT: ${MISSING_CAT:-__MISSING__}
     ports:
       - "8000:8000"
@@ -54,6 +55,7 @@ services:
   streamlit:
     build:
       context: .
+      dockerfile: docker/Dockerfile
       target: streamlit
     environment:
       API_URL: http://api:8000

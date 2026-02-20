@@ -28,7 +28,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "bandit>=1.9.3",
+    "pyright>=1.1.408",
     "pytest>=8.0",
+    "safety>=3.7.0",
 ]
 
 [tool.pytest.ini_options]

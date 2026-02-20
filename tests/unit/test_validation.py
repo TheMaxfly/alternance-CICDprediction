@@ -8,7 +8,7 @@ Tests verify that:
 """
 
 import pytest
-from streamlit_lib import validation
+from briefml.ui.lib import validation
 
 
 class TestUS05Validation:

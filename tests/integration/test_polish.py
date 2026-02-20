@@ -11,8 +11,8 @@ import pytest
 from unittest.mock import patch, MagicMock
 from requests.exceptions import Timeout, ConnectionError
 
-from streamlit_lib.api_client import call_predict_api, is_success_response, format_error_message
-from streamlit_lib.reference_loader import load_reference_data, get_dropdown_options
+from briefml.ui.lib.api_client import call_predict_api, is_success_response, format_error_message
+from briefml.ui.lib.reference_loader import load_reference_data, get_dropdown_options
 
 pytestmark = pytest.mark.integration
 
@@ -30,7 +30,7 @@ SAMPLE_INPUTS = {
 class TestT100TimeoutHandling:
     """T100: API timeout (>10s) → user-friendly message."""
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_timeout_returns_error_dict(self, mock_post):
         """Timeout returns error dict with 'timeout' type."""
         mock_post.side_effect = Timeout("Connection timed out")
@@ -38,7 +38,7 @@ class TestT100TimeoutHandling:
         assert not is_success_response(result)
         assert result["error"] == "timeout"
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_timeout_message_is_user_friendly(self, mock_post):
         """Timeout message mentions service unavailability."""
         mock_post.side_effect = Timeout("Connection timed out")
@@ -46,7 +46,7 @@ class TestT100TimeoutHandling:
         message = format_error_message(result)
         assert "réessayer" in message.lower() or "indisponible" in message.lower() or "temps" in message.lower()
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_connection_error_returns_error_dict(self, mock_post):
         """Connection error returns error dict with network/connection type."""
         from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -59,7 +59,7 @@ class TestT100TimeoutHandling:
 class TestT101ValidationErrorHandling:
     """T101: API 422 → parse field errors and display."""
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_422_returns_validation_error(self, mock_post):
         """422 response returns error dict with 'validation' type."""
         mock_response = MagicMock()
@@ -77,7 +77,7 @@ class TestT101ValidationErrorHandling:
         assert "formatted_errors" in result
         assert len(result["formatted_errors"]) == 2
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_422_formatted_errors_contain_field_names(self, mock_post):
         """422 formatted errors include field names."""
         mock_response = MagicMock()
@@ -92,7 +92,7 @@ class TestT101ValidationErrorHandling:
         result = call_predict_api(SAMPLE_INPUTS)
         assert any("lum" in err for err in result["formatted_errors"])
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_422_format_error_message_is_readable(self, mock_post):
         """422 formatted message is human-readable."""
         mock_response = MagicMock()
@@ -113,7 +113,7 @@ class TestT101ValidationErrorHandling:
 class TestT102ServerErrorHandling:
     """T102: API 500 → "Erreur serveur"."""
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_500_returns_server_error(self, mock_post):
         """500 response returns error dict with 'server' type."""
         mock_response = MagicMock()
@@ -126,7 +126,7 @@ class TestT102ServerErrorHandling:
         assert result["error"] == "server"
         assert result["status_code"] == 500
 
-    @patch("streamlit_lib.api_client.requests.post")
+    @patch("briefml.ui.lib.api_client.requests.post")
     def test_500_message_mentions_server(self, mock_post):
         """500 message mentions server error."""
         mock_response = MagicMock()
