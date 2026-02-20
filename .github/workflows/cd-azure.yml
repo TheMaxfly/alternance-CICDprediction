@@ -1,0 +1,219 @@
+name: CD - Deploy to Azure Container Apps
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "GitHub Environment to deploy"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - staging
+      image_tag:
+        description: "Optional image tag to deploy (ex: v0.2.0). Default: release tag or git-<sha7>"
+        required: false
+        type: string
+      deploy_streamlit:
+        description: "Also deploy Streamlit container app (requires vars.AZURE_CONTAINER_APP_STREAMLIT_NAME)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: azure-deploy-${{ github.event.inputs.environment || 'production' }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY_SERVER: ghcr.io
+  IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/alternance-cicdprediction
+  HEALTH_PATH: /health
+
+jobs:
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+
+    steps:
+      - name: Resolve image tag
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_EVENT_NAME}" == "release" ]]; then
+            image_tag="${{ github.event.release.tag_name }}"
+          elif [[ -n "${{ github.event.inputs.image_tag }}" ]]; then
+            image_tag="${{ github.event.inputs.image_tag }}"
+          else
+            image_tag="git-${GITHUB_SHA::7}"
+          fi
+
+          echo "tag=${image_tag}" >> "$GITHUB_OUTPUT"
+          echo "api_image=${{ env.IMAGE_BASE }}-api:${image_tag}" >> "$GITHUB_OUTPUT"
+          echo "streamlit_image=${{ env.IMAGE_BASE }}-streamlit:${image_tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Azure Login (AZURE_CREDENTIALS)
+        if: ${{ secrets.AZURE_CREDENTIALS != '' }}
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure Login (OIDC)
+        if: ${{ secrets.AZURE_CREDENTIALS == '' }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy API to Azure Container Apps
+        id: deploy_api
+        uses: azure/cli@v2
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.AZURE_CONTAINER_APP_API_NAME }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          IMAGE: ${{ steps.image.outputs.api_image }}
+        with:
+          inlineScript: |
+            set -euo pipefail
+
+            if [[ -z "${RESOURCE_GROUP:-}" || -z "${CONTAINER_APP_NAME:-}" ]]; then
+              echo "Missing required variables: AZURE_RESOURCE_GROUP, AZURE_CONTAINER_APP_API_NAME"
+              exit 1
+            fi
+            if [[ -z "${GHCR_USERNAME:-}" || -z "${GHCR_TOKEN:-}" ]]; then
+              echo "Missing required secrets: GHCR_USERNAME, GHCR_TOKEN"
+              exit 1
+            fi
+
+            az extension add --name containerapp --upgrade
+
+            secret_args=()
+            if [[ -n "${DATABASE_URL:-}" ]]; then
+              secret_args+=(--secrets "database-url=${DATABASE_URL}")
+              secret_args+=(--set-env-vars "DATABASE_URL=secretref:database-url")
+            fi
+
+            update_cmd() {
+              local image="$1"
+              az containerapp update \
+                --name "${CONTAINER_APP_NAME}" \
+                --resource-group "${RESOURCE_GROUP}" \
+                --image "${image}" \
+                --registry-server "${{ env.REGISTRY_SERVER }}" \
+                --registry-username "${GHCR_USERNAME}" \
+                --registry-password "${GHCR_TOKEN}" \
+                --set-env-vars \
+                  "MODEL_PATH=/app/model/catboost_product15_v2_time_bucket_final.cbm" \
+                  "META_PATH=/app/artifacts/catboost_product15_v2_time_bucket_final_meta.json" \
+                  "MISSING_CAT=__MISSING__" \
+                "${secret_args[@]}"
+            }
+
+            if ! update_cmd "${IMAGE}"; then
+              # Cas fréquent: la release est publiée avant que l'image taggée (ex: v0.2.0) soit dispo sur GHCR.
+              # On retente sur le tag SHA (toujours publié par le workflow Docker build/push).
+              sha7="git-${GITHUB_SHA::7}"
+              fallback="${{ env.IMAGE_BASE }}-api:${sha7}"
+              if [[ "${IMAGE}" == "${fallback}" ]]; then
+                echo "Deploy failed (already using SHA tag)."
+                exit 1
+              fi
+              echo "Deploy failed for ${IMAGE}. Retrying with ${fallback}..."
+              update_cmd "${fallback}"
+            fi
+
+            fqdn="$(az containerapp show --name "${CONTAINER_APP_NAME}" --resource-group "${RESOURCE_GROUP}" --query "properties.configuration.ingress.fqdn" -o tsv)"
+            if [[ -z "${fqdn:-}" ]]; then
+              echo "Unable to read Container App FQDN (is ingress enabled?)"
+              exit 1
+            fi
+            echo "fqdn=${fqdn}" >> "${GITHUB_OUTPUT}"
+
+      - name: Health check (API)
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://${{ steps.deploy_api.outputs.fqdn }}${{ env.HEALTH_PATH }}"
+          echo "Health check: ${url}"
+
+          for _ in $(seq 1 30); do
+            if curl -fsS --max-time 10 "${url}" > /dev/null; then
+              echo "OK"
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "Health check failed"
+          exit 1
+
+      - name: Deploy Streamlit to Azure Container Apps
+        if: ${{ github.event.inputs.deploy_streamlit == 'true' || (github.event_name == 'release' && vars.AZURE_CONTAINER_APP_STREAMLIT_NAME != '') }}
+        uses: azure/cli@v2
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.AZURE_CONTAINER_APP_STREAMLIT_NAME }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          IMAGE: ${{ steps.image.outputs.streamlit_image }}
+          API_BASE_URL: https://${{ steps.deploy_api.outputs.fqdn }}
+        with:
+          inlineScript: |
+            set -euo pipefail
+
+            if [[ -z "${CONTAINER_APP_NAME:-}" ]]; then
+              echo "Missing required variable: AZURE_CONTAINER_APP_STREAMLIT_NAME"
+              exit 1
+            fi
+
+            az extension add --name containerapp --upgrade
+
+            az containerapp update \
+              --name "${CONTAINER_APP_NAME}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --image "${IMAGE}" \
+              --registry-server "${{ env.REGISTRY_SERVER }}" \
+              --registry-username "${GHCR_USERNAME}" \
+              --registry-password "${GHCR_TOKEN}" \
+              --set-env-vars "API_URL=${API_BASE_URL}"
+
+      - name: Rollback on failure (API)
+        if: failure()
+        uses: azure/cli@v2
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.AZURE_CONTAINER_APP_API_NAME }}
+        with:
+          inlineScript: |
+            set -euo pipefail
+            az extension add --name containerapp --upgrade
+
+            prev="$(az containerapp revision list \
+              --name "${CONTAINER_APP_NAME}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --query "sort_by([?properties.active==\`true\`], &properties.createdTime)[-2].name" \
+              -o tsv || true)"
+
+            if [[ -z "${prev:-}" ]]; then
+              echo "No previous active revision found; skipping rollback."
+              exit 0
+            fi
+
+            echo "Activating previous revision: ${prev}"
+            az containerapp revision activate \
+              --name "${CONTAINER_APP_NAME}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --revision "${prev}"
