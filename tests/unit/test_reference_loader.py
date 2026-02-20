@@ -8,7 +8,8 @@ Tests:
 """
 
 import pytest
-from briefml.ui.lib.reference_loader import load_reference_data, get_field_help
+
+from briefml.ui.lib.reference_loader import get_field_help, load_reference_data
 
 
 class TestUS09FieldHelp:
@@ -57,19 +58,36 @@ class TestUS09FieldHelp:
     def test_all_15_fields_have_help(self, ref_data):
         """Every one of the 15 required fields has help text."""
         required_fields = [
-            "dep", "lum", "atm", "catr", "agg", "int", "circ",
-            "col", "vma_bucket", "catv_family_4", "manv_mode",
-            "driver_age_bucket", "choc_mode", "driver_trajet_family", "time_bucket"
+            "dep",
+            "lum",
+            "atm",
+            "catr",
+            "agg",
+            "int",
+            "circ",
+            "col",
+            "vma_bucket",
+            "catv_family_4",
+            "manv_mode",
+            "driver_age_bucket",
+            "choc_mode",
+            "driver_trajet_family",
+            "time_bucket",
         ]
         for field in required_fields:
             help_info = get_field_help(ref_data, field)
             assert help_info is not None, f"Field '{field}' has no help text"
-            assert len(help_info["definition"]) > 0, f"Field '{field}' has empty definition"
+            assert len(help_info["definition"]) > 0, (
+                f"Field '{field}' has empty definition"
+            )
 
     def test_get_field_help_dep_has_definition(self, ref_data):
         """dep field help contains meaningful definition."""
         help_info = get_field_help(ref_data, "dep")
-        assert "département" in help_info["definition"].lower() or "departement" in help_info["definition"].lower()
+        assert (
+            "département" in help_info["definition"].lower()
+            or "departement" in help_info["definition"].lower()
+        )
 
     def test_get_field_help_atm_includes_non_renseigne(self, ref_data):
         """atm help codes include -1 (Non renseigné)."""

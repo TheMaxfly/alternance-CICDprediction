@@ -12,8 +12,9 @@ Test scenarios:
 Following TDD: These tests MUST FAIL before implementation.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from briefml.ui.lib import session_state
 
@@ -24,7 +25,7 @@ class TestUS02Navigation:
     @pytest.fixture(autouse=True)
     def setup_session_state(self):
         """Setup mock session state for each test."""
-        with patch('streamlit.session_state', MagicMock()) as mock_state:
+        with patch("streamlit.session_state", MagicMock()) as mock_state:
             # Initialize clean state
             mock_state.current_page = 1
             mock_state.prediction_inputs = {}
@@ -50,11 +51,15 @@ class TestUS02Navigation:
             1: {"dep": "59", "agg": 2, "catr": 3, "vma_bucket": "51-80"},
             2: {"int": 1, "circ": 2},
             3: {"col": 3, "choc_mode": 1, "manv_mode": 1},
-            4: {"driver_age_bucket": "25-34", "driver_trajet_family": "trajet_1", "catv_family_4": "voitures_utilitaires"},
-            5: {"lum": 1, "atm": 1, "time_bucket": "morning_06_11"}
+            4: {
+                "driver_age_bucket": "25-34",
+                "driver_trajet_family": "trajet_1",
+                "catv_family_4": "voitures_utilitaires",
+            },
+            5: {"lum": 1, "atm": 1, "time_bucket": "morning_06_11"},
         }
 
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             for page_num in range(1, 6):
                 # Set current page
                 mock_state.get.return_value = page_num
@@ -74,7 +79,9 @@ class TestUS02Navigation:
             assert all_inputs.get("dep") == "59", "dep should be preserved"
             assert all_inputs.get("agg") == 2, "agg should be preserved"
             assert all_inputs.get("catr") == 3, "catr should be preserved"
-            assert all_inputs.get("vma_bucket") == "51-80", "vma_bucket should be preserved"
+            assert all_inputs.get("vma_bucket") == "51-80", (
+                "vma_bucket should be preserved"
+            )
 
             # Check Page 2 fields
             assert all_inputs.get("int") == 1, "int should be preserved"
@@ -86,14 +93,22 @@ class TestUS02Navigation:
             assert all_inputs.get("manv_mode") == 1, "manv_mode should be preserved"
 
             # Check Page 4 fields
-            assert all_inputs.get("driver_age_bucket") == "25-34", "driver_age_bucket should be preserved"
-            assert all_inputs.get("driver_trajet_family") == "trajet_1", "driver_trajet_family should be preserved"
-            assert all_inputs.get("catv_family_4") == "voitures_utilitaires", "catv_family_4 should be preserved"
+            assert all_inputs.get("driver_age_bucket") == "25-34", (
+                "driver_age_bucket should be preserved"
+            )
+            assert all_inputs.get("driver_trajet_family") == "trajet_1", (
+                "driver_trajet_family should be preserved"
+            )
+            assert all_inputs.get("catv_family_4") == "voitures_utilitaires", (
+                "catv_family_4 should be preserved"
+            )
 
             # Check Page 5 fields
             assert all_inputs.get("lum") == 1, "lum should be preserved"
             assert all_inputs.get("atm") == 1, "atm should be preserved"
-            assert all_inputs.get("time_bucket") == "morning_06_11", "time_bucket should be preserved"
+            assert all_inputs.get("time_bucket") == "morning_06_11", (
+                "time_bucket should be preserved"
+            )
 
             # Verify we're on page 6
             assert mock_state.current_page == 6, "Should be on page 6 after navigation"
@@ -108,7 +123,7 @@ class TestUS02Navigation:
         """
         mock_state = setup_session_state
 
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             # User is on page 1
             mock_state.get.return_value = 1
             mock_state.current_page = 1
@@ -121,8 +136,9 @@ class TestUS02Navigation:
             session_state.navigate_previous()
 
             # Verify still on page 1
-            assert mock_state.current_page == 1, \
+            assert mock_state.current_page == 1, (
                 "Précédent on page 1 should not go below page 1"
+            )
 
     def test_precedent_button_works_on_other_pages(self, setup_session_state):
         """
@@ -135,7 +151,7 @@ class TestUS02Navigation:
         mock_state = setup_session_state
 
         for start_page in range(2, 7):  # Test pages 2-6
-            with patch('streamlit.session_state', mock_state):
+            with patch("streamlit.session_state", mock_state):
                 mock_state.get.return_value = start_page
                 mock_state.current_page = start_page
 
@@ -144,8 +160,9 @@ class TestUS02Navigation:
 
                 # Verify page decremented
                 expected_page = start_page - 1
-                assert mock_state.current_page == expected_page, \
+                assert mock_state.current_page == expected_page, (
                     f"Précédent from page {start_page} should go to page {expected_page}"
+                )
 
     def test_suivant_button_works_on_all_pages(self, setup_session_state):
         """
@@ -158,7 +175,7 @@ class TestUS02Navigation:
         mock_state = setup_session_state
 
         for start_page in range(1, 6):  # Test pages 1-5
-            with patch('streamlit.session_state', mock_state):
+            with patch("streamlit.session_state", mock_state):
                 mock_state.get.return_value = start_page
                 mock_state.current_page = start_page
 
@@ -167,8 +184,9 @@ class TestUS02Navigation:
 
                 # Verify page incremented
                 expected_page = start_page + 1
-                assert mock_state.current_page == expected_page, \
+                assert mock_state.current_page == expected_page, (
                     f"Suivant from page {start_page} should go to page {expected_page}"
+                )
 
     def test_suivant_button_cannot_exceed_page_6(self, setup_session_state):
         """
@@ -180,7 +198,7 @@ class TestUS02Navigation:
         """
         mock_state = setup_session_state
 
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             mock_state.get.return_value = 6
             mock_state.current_page = 6
 
@@ -188,8 +206,9 @@ class TestUS02Navigation:
             session_state.navigate_next()
 
             # Verify still on page 6
-            assert mock_state.current_page == 6, \
+            assert mock_state.current_page == 6, (
                 "Suivant on page 6 should not exceed page 6"
+            )
 
     def test_field_validation_dropdown_only(self):
         """
@@ -209,15 +228,31 @@ class TestUS02Navigation:
 
         # All 15 fields should have options
         required_fields = [
-            "dep", "lum", "atm", "catr", "agg", "int", "circ", "col",
-            "vma_bucket", "catv_family_4", "manv_mode", "driver_age_bucket",
-            "choc_mode", "driver_trajet_family", "time_bucket"
+            "dep",
+            "lum",
+            "atm",
+            "catr",
+            "agg",
+            "int",
+            "circ",
+            "col",
+            "vma_bucket",
+            "catv_family_4",
+            "manv_mode",
+            "driver_age_bucket",
+            "choc_mode",
+            "driver_trajet_family",
+            "time_bucket",
         ]
 
         for field in required_fields:
             assert field in ref_data, f"Field '{field}' should have reference data"
-            assert isinstance(ref_data[field], list), f"Field '{field}' should have list of options"
-            assert len(ref_data[field]) > 0, f"Field '{field}' should have at least 1 option"
+            assert isinstance(ref_data[field], list), (
+                f"Field '{field}' should have list of options"
+            )
+            assert len(ref_data[field]) > 0, (
+                f"Field '{field}' should have at least 1 option"
+            )
 
             # Verify each option has 'code' and 'label' (dropdown format)
             for opt in ref_data[field]:
@@ -225,8 +260,9 @@ class TestUS02Navigation:
                 assert "label" in opt, f"Field '{field}' option missing 'label'"
 
         # time_bucket field should have 4 options
-        assert len(ref_data["time_bucket"]) == 4, \
+        assert len(ref_data["time_bucket"]) == 4, (
             "time_bucket field should have 4 dropdown options"
+        )
 
     def test_backward_forward_navigation_preserves_data(self, setup_session_state):
         """
@@ -238,7 +274,7 @@ class TestUS02Navigation:
         """
         mock_state = setup_session_state
 
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             # Page 1: Fill data
             mock_state.get.return_value = 1
             mock_state.current_page = 1

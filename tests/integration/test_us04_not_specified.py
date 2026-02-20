@@ -7,8 +7,8 @@ Tests verify that:
 """
 
 import pytest
-from briefml.ui.lib import reference_loader
 
+from briefml.ui.lib import reference_loader
 
 pytestmark = pytest.mark.integration
 
@@ -34,7 +34,9 @@ class TestUS04NotSpecified:
         non_renseigne_option = [opt for opt in atm_options if opt.startswith("-1 — ")]
 
         # Assert option exists
-        assert len(non_renseigne_option) == 1, "Should have exactly one '-1 — Non renseigné' option"
+        assert len(non_renseigne_option) == 1, (
+            "Should have exactly one '-1 — Non renseigné' option"
+        )
 
         # Act: simulate user selection and parsing
         selected = non_renseigne_option[0]
@@ -57,7 +59,9 @@ class TestUS04NotSpecified:
         labels = {opt["code"]: opt["label"] for opt in atm_options}
 
         assert -1 in codes, "atm should have code -1"
-        assert labels[-1] == "Non renseigné", "atm code -1 should have label 'Non renseigné'"
+        assert labels[-1] == "Non renseigné", (
+            "atm code -1 should have label 'Non renseigné'"
+        )
 
     def test_ref_options_includes_non_renseigne_for_circ(self):
         """
@@ -72,7 +76,9 @@ class TestUS04NotSpecified:
         labels = {opt["code"]: opt["label"] for opt in circ_options}
 
         assert -1 in codes, "circ should have code -1"
-        assert labels[-1] == "Non renseigné", "circ code -1 should have label 'Non renseigné'"
+        assert labels[-1] == "Non renseigné", (
+            "circ code -1 should have label 'Non renseigné'"
+        )
 
     def test_ref_options_includes_non_renseigne_for_col(self):
         """
@@ -87,7 +93,9 @@ class TestUS04NotSpecified:
         labels = {opt["code"]: opt["label"] for opt in col_options}
 
         assert -1 in codes, "col should have code -1"
-        assert labels[-1] == "Non renseigné", "col code -1 should have label 'Non renseigné'"
+        assert labels[-1] == "Non renseigné", (
+            "col code -1 should have label 'Non renseigné'"
+        )
 
     def test_ref_options_includes_non_renseigne_for_lum(self):
         """
@@ -102,7 +110,9 @@ class TestUS04NotSpecified:
         labels = {opt["code"]: opt["label"] for opt in lum_options}
 
         assert -1 in codes, "lum should have code -1"
-        assert labels[-1] == "Non renseigné", "lum code -1 should have label 'Non renseigné'"
+        assert labels[-1] == "Non renseigné", (
+            "lum code -1 should have label 'Non renseigné'"
+        )
 
     def test_non_renseigne_dropdown_format_is_consistent(self):
         """
@@ -118,10 +128,12 @@ class TestUS04NotSpecified:
             options = reference_loader.get_dropdown_options(self.ref_data, field)
             matching = [opt for opt in options if opt.startswith("-1 — ")]
 
-            assert len(matching) == 1, \
+            assert len(matching) == 1, (
                 f"Field '{field}' should have exactly one '-1 — Non renseigné' option"
-            assert "Non renseigné" in matching[0], \
+            )
+            assert "Non renseigné" in matching[0], (
                 f"Field '{field}' -1 option should contain 'Non renseigné'"
+            )
 
     def test_non_renseigne_roundtrip_for_all_fields(self):
         """
@@ -154,5 +166,6 @@ class TestUS04NotSpecified:
 
         for field in fields_with_non_renseigne:
             valid_codes = [opt["code"] for opt in self.ref_data[field]]
-            assert -1 in valid_codes, \
+            assert -1 in valid_codes, (
                 f"Field '{field}' should accept -1 as a valid API input"
+            )

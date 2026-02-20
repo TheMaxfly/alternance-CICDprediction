@@ -8,8 +8,8 @@ Tests verify that:
 """
 
 import pytest
-from briefml.ui.lib import reference_loader, session_state
 
+from briefml.ui.lib import reference_loader
 
 pytestmark = pytest.mark.integration
 
@@ -36,7 +36,9 @@ class TestUS03DropdownDisplay:
         assert len(lum_options) > 0
 
         # Check specific format for "Plein jour"
-        assert "1 — Plein jour" in lum_options, "Should contain formatted option '1 — Plein jour'"
+        assert "1 — Plein jour" in lum_options, (
+            "Should contain formatted option '1 — Plein jour'"
+        )
 
         # Verify all options use " — " separator
         for option in lum_options:
@@ -53,9 +55,21 @@ class TestUS03DropdownDisplay:
         # Arrange
         ref_data = reference_loader.load_reference_data()
         required_fields = [
-            "dep", "lum", "atm", "catr", "agg", "int", "circ",
-            "col", "vma_bucket", "catv_family_4", "manv_mode",
-            "driver_age_bucket", "choc_mode", "driver_trajet_family", "time_bucket"
+            "dep",
+            "lum",
+            "atm",
+            "catr",
+            "agg",
+            "int",
+            "circ",
+            "col",
+            "vma_bucket",
+            "catv_family_4",
+            "manv_mode",
+            "driver_age_bucket",
+            "choc_mode",
+            "driver_trajet_family",
+            "time_bucket",
         ]
 
         # Act & Assert
@@ -63,12 +77,14 @@ class TestUS03DropdownDisplay:
             options = reference_loader.get_dropdown_options(ref_data, field_name)
 
             # All options should be strings
-            assert all(isinstance(opt, str) for opt in options), \
+            assert all(isinstance(opt, str) for opt in options), (
                 f"Field '{field_name}' should have string options"
+            )
 
             # All options should use " — " separator
-            assert all(" — " in opt for opt in options), \
+            assert all(" — " in opt for opt in options), (
                 f"Field '{field_name}' options should use ' — ' separator"
+            )
 
             # Options should be parseable back to codes
             for option in options:
@@ -94,12 +110,15 @@ class TestUS03DropdownDisplay:
 
         # Check for specific department formats
         # Note: "Nord" might be in the data, checking for " — " pattern
-        assert any("59 — " in opt for opt in dep_options), \
+        assert any("59 — " in opt for opt in dep_options), (
             "Should contain formatted option for department 59"
+        )
 
         # All should use consistent format
         for option in dep_options:
-            assert " — " in option, f"Department option '{option}' should use ' — ' separator"
+            assert " — " in option, (
+                f"Department option '{option}' should use ' — ' separator"
+            )
 
     def test_atm_dropdown_includes_non_renseigne_option(self):
         """
@@ -132,16 +151,26 @@ class TestUS03DropdownDisplay:
         ref_data = reference_loader.load_reference_data()
 
         # Act
-        time_bucket_options = reference_loader.get_dropdown_options(ref_data, "time_bucket")
+        time_bucket_options = reference_loader.get_dropdown_options(
+            ref_data, "time_bucket"
+        )
 
         # Assert
         assert len(time_bucket_options) == 4, "Should have 4 time_bucket options"
 
         # Check specific formats
-        assert any("night_00_05 — " in opt for opt in time_bucket_options), "Should have 'night_00_05' option"
-        assert any("morning_06_11 — " in opt for opt in time_bucket_options), "Should have 'morning_06_11' option"
-        assert any("afternoon_12_17 — " in opt for opt in time_bucket_options), "Should have 'afternoon_12_17' option"
-        assert any("evening_18_23 — " in opt for opt in time_bucket_options), "Should have 'evening_18_23' option"
+        assert any("night_00_05 — " in opt for opt in time_bucket_options), (
+            "Should have 'night_00_05' option"
+        )
+        assert any("morning_06_11 — " in opt for opt in time_bucket_options), (
+            "Should have 'morning_06_11' option"
+        )
+        assert any("afternoon_12_17 — " in opt for opt in time_bucket_options), (
+            "Should have 'afternoon_12_17' option"
+        )
+        assert any("evening_18_23 — " in opt for opt in time_bucket_options), (
+            "Should have 'evening_18_23' option"
+        )
 
         # All should be formatted
         for option in time_bucket_options:
@@ -191,15 +220,22 @@ class TestUS03DropdownDisplay:
         # Page 5 fields
         page_5_fields = ["lum", "atm", "time_bucket"]
 
-        all_fields = page_1_fields + page_2_fields + page_3_fields + page_4_fields + page_5_fields
+        all_fields = (
+            page_1_fields
+            + page_2_fields
+            + page_3_fields
+            + page_4_fields
+            + page_5_fields
+        )
 
         # Act & Assert
         for field in all_fields:
             options = reference_loader.get_dropdown_options(ref_data, field)
 
             assert len(options) > 0, f"Field '{field}' should have at least one option"
-            assert all(" — " in opt for opt in options), \
+            assert all(" — " in opt for opt in options), (
                 f"Field '{field}' should have all options formatted"
+            )
 
     def test_formatted_options_preserve_special_characters(self):
         """
@@ -225,7 +261,7 @@ class TestUS03DropdownDisplay:
             # Should be valid UTF-8 string
             assert isinstance(option, str)
             # Should be able to encode/decode
-            assert option == option.encode('utf-8').decode('utf-8')
+            assert option == option.encode("utf-8").decode("utf-8")
 
     def test_dropdown_options_are_stable_across_calls(self):
         """
@@ -248,5 +284,6 @@ class TestUS03DropdownDisplay:
 
         # Order should be preserved
         for i in range(len(lum_options_1)):
-            assert lum_options_1[i] == lum_options_2[i], \
+            assert lum_options_1[i] == lum_options_2[i], (
                 f"Option at index {i} should be the same"
+            )

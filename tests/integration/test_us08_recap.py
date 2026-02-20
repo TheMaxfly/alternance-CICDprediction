@@ -7,10 +7,10 @@ Tests verify that:
 3. Table is generated correctly from session state
 """
 
-import pytest
 import pandas as pd
-from briefml.ui.lib import session_state, reference_loader
+import pytest
 
+from briefml.ui.lib import reference_loader, session_state
 
 pytestmark = pytest.mark.integration
 
@@ -42,7 +42,7 @@ class TestUS08RecapTable:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Load reference data
@@ -90,7 +90,7 @@ class TestUS08RecapTable:
             "driver_age_bucket": 30,
             "choc_mode": 1,
             "driver_trajet_family": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
         ref_data = reference_loader.load_reference_data()
 
@@ -118,11 +118,21 @@ class TestUS08RecapTable:
         """
         # Arrange
         inputs = {
-            "dep": "59", "agg": 1, "catr": 1, "vma_bucket": 50,  # Page 1
-            "int": 1, "circ": 1,  # Page 2
-            "col": 2, "choc_mode": 1, "manv_mode": 1,  # Page 3
-            "driver_age_bucket": 30, "driver_trajet_family": 1, "catv_family_4": 1,  # Page 4
-            "lum": 1, "atm": 1, "time_bucket": "morning_06_11"  # Page 5
+            "dep": "59",
+            "agg": 1,
+            "catr": 1,
+            "vma_bucket": 50,  # Page 1
+            "int": 1,
+            "circ": 1,  # Page 2
+            "col": 2,
+            "choc_mode": 1,
+            "manv_mode": 1,  # Page 3
+            "driver_age_bucket": 30,
+            "driver_trajet_family": 1,
+            "catv_family_4": 1,  # Page 4
+            "lum": 1,
+            "atm": 1,
+            "time_bucket": "morning_06_11",  # Page 5
         }
         ref_data = reference_loader.load_reference_data()
 
@@ -160,7 +170,7 @@ class TestUS08RecapTable:
             "col": 2,
             "choc_mode": 1,
             "manv_mode": 1,
-            "driver_age_bucket": 30
+            "driver_age_bucket": 30,
             # Missing: driver_trajet_family, catv_family_4, lum, atm, time_bucket
         }
         ref_data = reference_loader.load_reference_data()
@@ -173,8 +183,12 @@ class TestUS08RecapTable:
 
         # Missing fields should not appear
         field_names = recap_table["Champ"].tolist()
-        assert "Conditions d'éclairage" not in field_names, "lum should not appear (missing)"
-        assert "Tranche horaire" not in field_names, "time_bucket should not appear (missing)"
+        assert "Conditions d'éclairage" not in field_names, (
+            "lum should not appear (missing)"
+        )
+        assert "Tranche horaire" not in field_names, (
+            "time_bucket should not appear (missing)"
+        )
 
     def test_recap_table_includes_page_column_for_navigation(self):
         """
@@ -186,11 +200,21 @@ class TestUS08RecapTable:
         """
         # Arrange
         inputs = {
-            "dep": "59", "agg": 1, "catr": 1, "vma_bucket": 50,
-            "int": 1, "circ": 1,
-            "col": 2, "choc_mode": 1, "manv_mode": 1,
-            "driver_age_bucket": 30, "driver_trajet_family": 1, "catv_family_4": 1,
-            "lum": 1, "atm": 1, "time_bucket": "morning_06_11"
+            "dep": "59",
+            "agg": 1,
+            "catr": 1,
+            "vma_bucket": 50,
+            "int": 1,
+            "circ": 1,
+            "col": 2,
+            "choc_mode": 1,
+            "manv_mode": 1,
+            "driver_age_bucket": 30,
+            "driver_trajet_family": 1,
+            "catv_family_4": 1,
+            "lum": 1,
+            "atm": 1,
+            "time_bucket": "morning_06_11",
         }
         ref_data = reference_loader.load_reference_data()
 
@@ -204,7 +228,9 @@ class TestUS08RecapTable:
         dep_page = recap_table[recap_table["Champ"] == "Département"]["Page"].values[0]
         assert dep_page == 1, "dep should be on page 1"
 
-        lum_page = recap_table[recap_table["Champ"] == "Conditions d'éclairage"]["Page"].values[0]
+        lum_page = recap_table[recap_table["Champ"] == "Conditions d'éclairage"][
+            "Page"
+        ].values[0]
         assert lum_page == 5, "lum should be on page 5"
 
     def test_recap_table_uses_french_labels(self):
@@ -217,10 +243,21 @@ class TestUS08RecapTable:
         """
         # Arrange
         inputs = {
-            "dep": "59", "lum": 1, "atm": 1, "catr": 1, "agg": 1,
-            "int": 1, "circ": 1, "col": 2, "vma_bucket": 50,
-            "catv_family_4": 1, "manv_mode": 1, "driver_age_bucket": 30,
-            "choc_mode": 1, "driver_trajet_family": 1, "time_bucket": "morning_06_11"
+            "dep": "59",
+            "lum": 1,
+            "atm": 1,
+            "catr": 1,
+            "agg": 1,
+            "int": 1,
+            "circ": 1,
+            "col": 2,
+            "vma_bucket": 50,
+            "catv_family_4": 1,
+            "manv_mode": 1,
+            "driver_age_bucket": 30,
+            "choc_mode": 1,
+            "driver_trajet_family": 1,
+            "time_bucket": "morning_06_11",
         }
         ref_data = reference_loader.load_reference_data()
 
@@ -255,10 +292,14 @@ class TestUS08RecapTable:
         recap_table = session_state.generate_recap_table(empty_inputs, ref_data)
 
         # Assert
-        assert isinstance(recap_table, pd.DataFrame), "Should return DataFrame even if empty"
+        assert isinstance(recap_table, pd.DataFrame), (
+            "Should return DataFrame even if empty"
+        )
         assert len(recap_table) == 0, "Should have 0 rows for empty inputs"
 
         # Columns should still exist
         expected_columns = ["Champ", "Code", "Libellé", "Page"]
         for col in expected_columns:
-            assert col in recap_table.columns, f"Should have '{col}' column even when empty"
+            assert col in recap_table.columns, (
+                f"Should have '{col}' column even when empty"
+            )

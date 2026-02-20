@@ -7,7 +7,6 @@ Tests verify that:
 3. Missing fields messages are properly formatted
 """
 
-import pytest
 from briefml.ui.lib import validation
 
 
@@ -37,7 +36,7 @@ class TestUS05Validation:
             "driver_trajet_family": 1,
             "catv_family_4": 1,
             "lum": 1,
-            "atm": 1
+            "atm": 1,
             # time_bucket is missing (14/15)
         }
 
@@ -72,7 +71,7 @@ class TestUS05Validation:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Act
@@ -123,7 +122,7 @@ class TestUS05Validation:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": None  # None value
+            "time_bucket": None,  # None value
         }
 
         # Act
@@ -153,7 +152,7 @@ class TestUS05Validation:
             "manv_mode": 1,
             "driver_age_bucket": 30,
             "driver_trajet_family": 1,
-            "catv_family_4": 1
+            "catv_family_4": 1,
         }
 
         # Act
@@ -186,7 +185,7 @@ class TestUS05Validation:
             "driver_trajet_family": 1,
             "catv_family_4": 1,
             "lum": 1,
-            "atm": 1
+            "atm": 1,
             # Missing: dep (page 1), col (page 3), time_bucket (page 5)
         }
 
@@ -230,7 +229,7 @@ class TestUS05Validation:
             "driver_trajet_family": 1,
             "catv_family_4": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Act
@@ -267,7 +266,7 @@ class TestUS05Validation:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Act
@@ -296,19 +295,31 @@ class TestUS05Validation:
             "vma_bucket": 50,
             "int": 1,
             "circ": 1,
-            "col": 2
+            "col": 2,
         }
         percentage = validation.get_completion_percentage(half)
         expected = (7 / 15) * 100  # ~46.67%
-        assert abs(percentage - expected) < 0.01, f"Expected ~{expected}%, got {percentage}%"
+        assert abs(percentage - expected) < 0.01, (
+            f"Expected ~{expected}%, got {percentage}%"
+        )
 
         # Test 100%
         complete = {
-            "dep": "59", "agg": 1, "catr": 1, "vma_bucket": 50,
-            "int": 1, "circ": 1, "col": 2, "choc_mode": 1,
-            "manv_mode": 1, "driver_age_bucket": 30,
-            "driver_trajet_family": 1, "catv_family_4": 1,
-            "lum": 1, "atm": 1, "time_bucket": "morning_06_11"
+            "dep": "59",
+            "agg": 1,
+            "catr": 1,
+            "vma_bucket": 50,
+            "int": 1,
+            "circ": 1,
+            "col": 2,
+            "choc_mode": 1,
+            "manv_mode": 1,
+            "driver_age_bucket": 30,
+            "driver_trajet_family": 1,
+            "catv_family_4": 1,
+            "lum": 1,
+            "atm": 1,
+            "time_bucket": "morning_06_11",
         }
         assert validation.get_completion_percentage(complete) == 100.0
 

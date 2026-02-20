@@ -11,13 +11,12 @@ Test scenarios:
 Following TDD: These tests MUST FAIL before implementation.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
-import streamlit as st
 
+import pytest
 
 # Import the modules we're testing
-from briefml.ui.lib import session_state, reference_loader
+from briefml.ui.lib import session_state
 
 
 class TestUS01Reset:
@@ -31,14 +30,10 @@ class TestUS01Reset:
         This fixture runs before each test to ensure clean state.
         """
         # Create a mock session_state object
-        with patch('streamlit.session_state', MagicMock()) as mock_state:
+        with patch("streamlit.session_state", MagicMock()) as mock_state:
             # Initialize with some data to test reset
             mock_state.current_page = 3
-            mock_state.prediction_inputs = {
-                "dep": "59",
-                "lum": 1,
-                "atm": 1
-            }
+            mock_state.prediction_inputs = {"dep": "59", "lum": 1, "atm": 1}
             mock_state.last_prediction = {"probability": 0.68, "prediction": "grave"}
             mock_state.validation_errors = {"dep": "Some error"}
             mock_state.is_form_complete = False
@@ -60,12 +55,13 @@ class TestUS01Reset:
         assert len(mock_state.prediction_inputs) > 0, "Initial state should have data"
 
         # Call reset_form
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             session_state.reset_form()
 
         # Verify prediction_inputs is cleared
-        assert mock_state.prediction_inputs == {}, \
+        assert mock_state.prediction_inputs == {}, (
             "prediction_inputs should be empty after reset"
+        )
 
     def test_reset_clears_last_prediction(self, setup_session_state):
         """
@@ -78,15 +74,18 @@ class TestUS01Reset:
         mock_state = setup_session_state
 
         # Verify initial state has prediction
-        assert mock_state.last_prediction is not None, "Initial state should have prediction"
+        assert mock_state.last_prediction is not None, (
+            "Initial state should have prediction"
+        )
 
         # Call reset_form
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             session_state.reset_form()
 
         # Verify last_prediction is cleared
-        assert mock_state.last_prediction is None, \
+        assert mock_state.last_prediction is None, (
             "last_prediction should be None after reset"
+        )
 
     def test_reset_clears_validation_errors(self, setup_session_state):
         """
@@ -102,12 +101,13 @@ class TestUS01Reset:
         assert len(mock_state.validation_errors) > 0, "Initial state should have errors"
 
         # Call reset_form
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             session_state.reset_form()
 
         # Verify validation_errors is cleared
-        assert mock_state.validation_errors == {}, \
+        assert mock_state.validation_errors == {}, (
             "validation_errors should be empty after reset"
+        )
 
     def test_reset_sets_current_page_to_1(self, setup_session_state):
         """
@@ -123,12 +123,11 @@ class TestUS01Reset:
         assert mock_state.current_page == 3, "Initial state should be on page 3"
 
         # Call reset_form
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             session_state.reset_form()
 
         # Verify current_page is set to 1
-        assert mock_state.current_page == 1, \
-            "current_page should be 1 after reset"
+        assert mock_state.current_page == 1, "current_page should be 1 after reset"
 
     def test_reset_sets_form_complete_to_false(self, setup_session_state):
         """
@@ -141,12 +140,13 @@ class TestUS01Reset:
         mock_state = setup_session_state
 
         # Call reset_form
-        with patch('streamlit.session_state', mock_state):
+        with patch("streamlit.session_state", mock_state):
             session_state.reset_form()
 
         # Verify is_form_complete is False
-        assert mock_state.is_form_complete is False, \
+        assert mock_state.is_form_complete is False, (
             "is_form_complete should be False after reset"
+        )
 
     def test_progress_indicator_page_1(self):
         """
@@ -156,10 +156,10 @@ class TestUS01Reset:
         When: Progress indicator is displayed
         Then: It should show "Page 1/6"
         """
-        with patch('streamlit.session_state') as mock_state:
+        with patch("streamlit.session_state") as mock_state:
             mock_state.get.return_value = 1
 
-            with patch('streamlit.session_state', mock_state):
+            with patch("streamlit.session_state", mock_state):
                 current = session_state.get_current_page()
 
             # Verify current page is 1
@@ -167,8 +167,9 @@ class TestUS01Reset:
 
             # Format progress indicator string
             progress_text = f"Page {current}/6"
-            assert progress_text == "Page 1/6", \
+            assert progress_text == "Page 1/6", (
                 f"Progress indicator should be 'Page 1/6', got '{progress_text}'"
+            )
 
     def test_progress_indicator_updates_with_page(self):
         """
@@ -179,10 +180,10 @@ class TestUS01Reset:
         Then: It should show correct "Page X/6" for each page
         """
         for page_num in range(1, 7):  # Test pages 1-6
-            with patch('streamlit.session_state') as mock_state:
+            with patch("streamlit.session_state") as mock_state:
                 mock_state.get.return_value = page_num
 
-                with patch('streamlit.session_state', mock_state):
+                with patch("streamlit.session_state", mock_state):
                     current = session_state.get_current_page()
 
                 # Verify current page
@@ -191,8 +192,9 @@ class TestUS01Reset:
                 # Format progress indicator string
                 progress_text = f"Page {current}/6"
                 expected = f"Page {page_num}/6"
-                assert progress_text == expected, \
+                assert progress_text == expected, (
                     f"Progress indicator should be '{expected}', got '{progress_text}'"
+                )
 
     def test_progress_indicator_after_reset(self):
         """
@@ -202,7 +204,7 @@ class TestUS01Reset:
         When: reset_form() is called
         Then: Progress indicator should show "Page 1/6"
         """
-        with patch('streamlit.session_state') as mock_state:
+        with patch("streamlit.session_state") as mock_state:
             # User is on page 5
             mock_state.current_page = 5
             mock_state.prediction_inputs = {"dep": "59", "lum": 1}
@@ -211,7 +213,7 @@ class TestUS01Reset:
             mock_state.is_form_complete = False
 
             # Call reset
-            with patch('streamlit.session_state', mock_state):
+            with patch("streamlit.session_state", mock_state):
                 session_state.reset_form()
 
             # Verify current page is 1
@@ -219,8 +221,9 @@ class TestUS01Reset:
 
             # Format progress indicator string
             progress_text = f"Page {mock_state.current_page}/6"
-            assert progress_text == "Page 1/6", \
+            assert progress_text == "Page 1/6", (
                 f"Progress indicator should be 'Page 1/6' after reset, got '{progress_text}'"
+            )
 
     def test_navigation_preserves_inputs(self):
         """
@@ -230,21 +233,22 @@ class TestUS01Reset:
         When: navigate_next() is called
         Then: prediction_inputs should be preserved
         """
-        with patch('streamlit.session_state') as mock_state:
+        with patch("streamlit.session_state") as mock_state:
             mock_state.get.return_value = 1
             mock_state.current_page = 1
             mock_state.prediction_inputs = {"dep": "59", "lum": 1}
 
             # Navigate next
-            with patch('streamlit.session_state', mock_state):
+            with patch("streamlit.session_state", mock_state):
                 session_state.navigate_next()
 
             # Verify page incremented
             assert mock_state.current_page == 2, "Current page should be 2"
 
             # Verify inputs preserved
-            assert mock_state.prediction_inputs == {"dep": "59", "lum": 1}, \
+            assert mock_state.prediction_inputs == {"dep": "59", "lum": 1}, (
                 "prediction_inputs should be preserved during navigation"
+            )
 
 
 # Pytest markers

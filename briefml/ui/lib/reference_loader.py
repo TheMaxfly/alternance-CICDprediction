@@ -12,7 +12,9 @@ from pathlib import Path
 from typing import Any
 
 
-def load_reference_data(json_path: str = "data/ref_options.json") -> dict[str, list[dict[str, Any]]]:
+def load_reference_data(
+    json_path: str = "data/ref_options.json",
+) -> dict[str, list[dict[str, Any]]]:
     """
     Load and validate reference data from JSON file.
 
@@ -36,16 +38,28 @@ def load_reference_data(json_path: str = "data/ref_options.json") -> dict[str, l
         )
 
     try:
-        with open(json_file, 'r', encoding='utf-8') as f:
+        with open(json_file, encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON in {json_path}: {e}")
+        raise ValueError(f"Invalid JSON in {json_path}: {e}") from e
 
     # Validate required fields
     required_fields = [
-        "dep", "lum", "atm", "catr", "agg", "int", "circ", "col",
-        "vma_bucket", "catv_family_4", "manv_mode", "driver_age_bucket",
-        "choc_mode", "driver_trajet_family", "time_bucket"
+        "dep",
+        "lum",
+        "atm",
+        "catr",
+        "agg",
+        "int",
+        "circ",
+        "col",
+        "vma_bucket",
+        "catv_family_4",
+        "manv_mode",
+        "driver_age_bucket",
+        "choc_mode",
+        "driver_trajet_family",
+        "time_bucket",
     ]
 
     missing_fields = [field for field in required_fields if field not in data]
@@ -65,10 +79,12 @@ def load_reference_data(json_path: str = "data/ref_options.json") -> dict[str, l
         # Validate each option has 'code' and 'label'
         for idx, option in enumerate(data[field]):
             if not isinstance(option, dict):
-                raise ValueError(f"Field '{field}' option {idx} must be a dict, got {type(option)}")
-            if 'code' not in option:
+                raise ValueError(
+                    f"Field '{field}' option {idx} must be a dict, got {type(option)}"
+                )
+            if "code" not in option:
                 raise ValueError(f"Field '{field}' option {idx} is missing 'code' key")
-            if 'label' not in option:
+            if "label" not in option:
                 raise ValueError(f"Field '{field}' option {idx} is missing 'label' key")
 
     return data
@@ -94,7 +110,9 @@ def format_dropdown_option(code: int | str, label: str) -> str:
     return f"{code} — {label}"
 
 
-def get_dropdown_options(reference_data: dict[str, list[dict[str, Any]]], field_name: str) -> list[str]:
+def get_dropdown_options(
+    reference_data: dict[str, list[dict[str, Any]]], field_name: str
+) -> list[str]:
     """
     Get formatted dropdown options for a specific field.
 
@@ -112,7 +130,7 @@ def get_dropdown_options(reference_data: dict[str, list[dict[str, Any]]], field_
         raise KeyError(f"Field '{field_name}' not found in reference data")
 
     options = reference_data[field_name]
-    return [format_dropdown_option(opt['code'], opt['label']) for opt in options]
+    return [format_dropdown_option(opt["code"], opt["label"]) for opt in options]
 
 
 def parse_dropdown_value(formatted_value: str) -> str | int:
@@ -148,7 +166,9 @@ def parse_dropdown_value(formatted_value: str) -> str | int:
         return code_str
 
 
-def get_label_for_code(reference_data: dict[str, list[dict[str, Any]]], field_name: str, code: int | str) -> str:
+def get_label_for_code(
+    reference_data: dict[str, list[dict[str, Any]]], field_name: str, code: int | str
+) -> str:
     """
     Get label for a specific code in a field.
 
@@ -169,13 +189,15 @@ def get_label_for_code(reference_data: dict[str, list[dict[str, Any]]], field_na
 
     options = reference_data[field_name]
     for opt in options:
-        if opt['code'] == code or str(opt['code']) == str(code):
-            return opt['label']
+        if opt["code"] == code or str(opt["code"]) == str(code):
+            return opt["label"]
 
     raise ValueError(f"Code '{code}' not found in field '{field_name}'")
 
 
-def get_field_help(reference_data: dict[str, list[dict[str, Any]]], field_name: str) -> dict[str, Any] | None:
+def get_field_help(
+    reference_data: dict[str, list[dict[str, Any]]], field_name: str
+) -> dict[str, Any] | None:
     """
     Get contextual help for a field: definition + code table.
 
@@ -192,13 +214,10 @@ def get_field_help(reference_data: dict[str, list[dict[str, Any]]], field_name: 
     if field_name not in reference_data:
         return None
 
-    help_texts = reference_data.get("help_texts", {})
+    help_texts: dict[str, str] = reference_data.get("help_texts", {})  # type: ignore[assignment]
     definition = help_texts.get(field_name, "")
 
     if not definition:
         return None
 
-    return {
-        "definition": definition,
-        "codes": reference_data[field_name]
-    }
+    return {"definition": definition, "codes": reference_data[field_name]}

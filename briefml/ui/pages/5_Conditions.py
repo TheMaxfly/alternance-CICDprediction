@@ -5,7 +5,8 @@ Fields: lum, atm, time_bucket
 """
 
 import streamlit as st
-from briefml.ui.lib import session_state, reference_loader
+
+from briefml.ui.lib import reference_loader, session_state
 
 
 def render():
@@ -24,12 +25,16 @@ def render():
 
     lum_index = 0
     if current_lum:
-        formatted_current = reference_loader.format_dropdown_option(current_lum,
-            reference_loader.get_label_for_code(ref_data, "lum", current_lum))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_lum,
+            reference_loader.get_label_for_code(ref_data, "lum", current_lum),
+        )
         if formatted_current in lum_options:
             lum_index = lum_options.index(formatted_current)
 
-    lum_selected = st.selectbox("Luminosite", options=lum_options, index=lum_index, key="lum_input")
+    lum_selected = st.selectbox(
+        "Luminosite", options=lum_options, index=lum_index, key="lum_input"
+    )
     if lum_selected:
         lum_code = reference_loader.parse_dropdown_value(lum_selected)
         session_state.set_prediction_input("lum", lum_code)
@@ -48,12 +53,19 @@ def render():
 
     atm_index = 0
     if current_atm:
-        formatted_current = reference_loader.format_dropdown_option(current_atm,
-            reference_loader.get_label_for_code(ref_data, "atm", current_atm))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_atm,
+            reference_loader.get_label_for_code(ref_data, "atm", current_atm),
+        )
         if formatted_current in atm_options:
             atm_index = atm_options.index(formatted_current)
 
-    atm_selected = st.selectbox("Conditions atmospheriques", options=atm_options, index=atm_index, key="atm_input")
+    atm_selected = st.selectbox(
+        "Conditions atmospheriques",
+        options=atm_options,
+        index=atm_index,
+        key="atm_input",
+    )
     if atm_selected:
         atm_code = reference_loader.parse_dropdown_value(atm_selected)
         session_state.set_prediction_input("atm", atm_code)
@@ -72,8 +84,12 @@ def render():
 
     time_bucket_index = 0
     if current_time_bucket is not None:
-        formatted_current = reference_loader.format_dropdown_option(current_time_bucket,
-            reference_loader.get_label_for_code(ref_data, "time_bucket", current_time_bucket))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_time_bucket,
+            reference_loader.get_label_for_code(
+                ref_data, "time_bucket", current_time_bucket
+            ),
+        )
         if formatted_current in time_bucket_options:
             time_bucket_index = time_bucket_options.index(formatted_current)
 
@@ -82,7 +98,7 @@ def render():
         options=time_bucket_options,
         index=time_bucket_index,
         key="time_bucket_input",
-        help="Tranche horaire de l'accident"
+        help="Tranche horaire de l'accident",
     )
     if time_bucket_selected:
         time_bucket_code = reference_loader.parse_dropdown_value(time_bucket_selected)
@@ -112,8 +128,10 @@ def render():
 
 # Standalone execution
 if __name__ == "__main__":
-    st.set_page_config(page_title="Page 5 - Conditions", page_icon="🌤️", layout="centered")
-    if 'reference_data' not in st.session_state:
+    st.set_page_config(
+        page_title="Page 5 - Conditions", page_icon="🌤️", layout="centered"
+    )
+    if "reference_data" not in st.session_state:
         reference_data = reference_loader.load_reference_data()
         session_state.initialize_state(reference_data)
     render()

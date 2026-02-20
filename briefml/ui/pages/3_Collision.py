@@ -5,7 +5,8 @@ Fields: col, choc_mode, manv_mode
 """
 
 import streamlit as st
-from briefml.ui.lib import session_state, reference_loader
+
+from briefml.ui.lib import reference_loader, session_state
 
 
 def render():
@@ -24,12 +25,16 @@ def render():
 
     col_index = 0
     if current_col:
-        formatted_current = reference_loader.format_dropdown_option(current_col,
-            reference_loader.get_label_for_code(ref_data, "col", current_col))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_col,
+            reference_loader.get_label_for_code(ref_data, "col", current_col),
+        )
         if formatted_current in col_options:
             col_index = col_options.index(formatted_current)
 
-    col_selected = st.selectbox("Type de collision", options=col_options, index=col_index, key="col_input")
+    col_selected = st.selectbox(
+        "Type de collision", options=col_options, index=col_index, key="col_input"
+    )
     if col_selected:
         col_code = reference_loader.parse_dropdown_value(col_selected)
         session_state.set_prediction_input("col", col_code)
@@ -48,12 +53,16 @@ def render():
 
     choc_index = 0
     if current_choc:
-        formatted_current = reference_loader.format_dropdown_option(current_choc,
-            reference_loader.get_label_for_code(ref_data, "choc_mode", current_choc))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_choc,
+            reference_loader.get_label_for_code(ref_data, "choc_mode", current_choc),
+        )
         if formatted_current in choc_options:
             choc_index = choc_options.index(formatted_current)
 
-    choc_selected = st.selectbox("Point de choc", options=choc_options, index=choc_index, key="choc_input")
+    choc_selected = st.selectbox(
+        "Point de choc", options=choc_options, index=choc_index, key="choc_input"
+    )
     if choc_selected:
         choc_code = reference_loader.parse_dropdown_value(choc_selected)
         session_state.set_prediction_input("choc_mode", choc_code)
@@ -72,12 +81,16 @@ def render():
 
     manv_index = 0
     if current_manv:
-        formatted_current = reference_loader.format_dropdown_option(current_manv,
-            reference_loader.get_label_for_code(ref_data, "manv_mode", current_manv))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_manv,
+            reference_loader.get_label_for_code(ref_data, "manv_mode", current_manv),
+        )
         if formatted_current in manv_options:
             manv_index = manv_options.index(formatted_current)
 
-    manv_selected = st.selectbox("Manoeuvre", options=manv_options, index=manv_index, key="manv_input")
+    manv_selected = st.selectbox(
+        "Manoeuvre", options=manv_options, index=manv_index, key="manv_input"
+    )
     if manv_selected:
         manv_code = reference_loader.parse_dropdown_value(manv_selected)
         session_state.set_prediction_input("manv_mode", manv_code)
@@ -106,8 +119,10 @@ def render():
 
 # Standalone execution
 if __name__ == "__main__":
-    st.set_page_config(page_title="Page 3 - Collision", page_icon="💥", layout="centered")
-    if 'reference_data' not in st.session_state:
+    st.set_page_config(
+        page_title="Page 3 - Collision", page_icon="💥", layout="centered"
+    )
+    if "reference_data" not in st.session_state:
         reference_data = reference_loader.load_reference_data()
         session_state.initialize_state(reference_data)
     render()
