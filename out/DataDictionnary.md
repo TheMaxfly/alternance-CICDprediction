@@ -92,7 +92,7 @@
 ## 2) Nomenclatures BAAC utiles (extraits)
 
 ### 2.1 Caractéristiques
-- `lum` (lumière) :  
+- `lum` (lumière) :
   1 plein jour ; 2 crépuscule/aube ; 3 nuit sans éclairage public ; 4 nuit éclairage non allumé ; 5 nuit éclairage allumé.
 - `agg` (localisation) : 1 hors agglomération ; 2 en agglomération.
 - `int` (intersection) : 1 hors intersection ; 2 en X ; 3 en T ; 4 en Y ; 5 >4 branches ; 6 giratoire ; 7 place ; 8 passage à niveau ; 9 autre.
@@ -112,7 +112,7 @@
 
 ### 2.3 Véhicules (si tu veux interpréter `*_mode`)
 - `senc` (sens) : 0 inconnu ; 1 repère croissant ; 2 repère décroissant ; 3 absence de repère.
-- `catv` : liste longue (exemples fréquents) :  
+- `catv` : liste longue (exemples fréquents) :
   01 bicyclette ; 02 cyclomoteur <50 ; 03 voiturette ; 07 VL ; 10 VU ; 13/14/15 PL ; 16/17 tracteur routier ; 21 tracteur agricole ; 30+ deux-roues >50 ; 37 autobus ; 38 autocar ; 50 EDP moteur ; 60 EDP sans moteur ; 80 VAE ; 99 autre.
 - `motor` (motorisation) : 1 hydrocarbures ; 2 hybride ; 3 électrique ; 4 hydrogène ; 5 humaine ; 6 autre.
 - `obs` (obstacle fixe) : 0 sans objet ; 1 véhicule stationné ; 2 arbre ; 3 glissière métal ; 4 glissière béton ; … ; 16 sortie de chaussée sans obstacle ; 17 buse/tête d’aqueduc.

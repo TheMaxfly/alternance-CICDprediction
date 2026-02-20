@@ -90,9 +90,7 @@ def test_predict_endpoint_success(valid_payload):
     assert "threshold" in result, "Response missing 'threshold' field"
 
     # Validate probability
-    assert isinstance(result["probability"], (int, float)), (
-        "probability must be numeric"
-    )
+    assert isinstance(result["probability"], int | float), "probability must be numeric"
     assert 0.0 <= result["probability"] <= 1.0, (
         "probability must be between 0.0 and 1.0"
     )
