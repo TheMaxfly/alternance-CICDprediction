@@ -1,0 +1,2092 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="API de prédiction de la gravité des accidents de la route (CatBoost + FastAPI + Streamlit)">
+      
+      
+        <meta name="author" content="TheMaxfly">
+      
+      
+        <link rel="canonical" href="https://themaxfly.github.io/alternance-CICDprediction/data_dictionary/">
+      
+      
+        <link rel="prev" href="../api_dictionary/">
+      
+      
+        <link rel="next" href="../cicd/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Dictionnaire des données - BriefML — Prédiction d'accidentologie</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#referentiel-dentree-modele-catboost-product15_v2-time_bucket-a-la-place-de-minute" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href=".." title="BriefML — Prédiction d&#39;accidentologie" class="md-header__button md-logo" aria-label="BriefML — Prédiction d'accidentologie" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BriefML — Prédiction d'accidentologie
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Dictionnaire des données
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-label="Mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-label="Mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TheMaxfly/alternance-CICDprediction" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TheMaxfly/alternance-CICDprediction
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Démarrage
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/predictor/" class="md-tabs__link">
+          
+  
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../api_dictionary/" class="md-tabs__link">
+          
+  
+  
+  Référence
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cicd/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CI/CD
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../changelog/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="BriefML — Prédiction d&#39;accidentologie" class="md-nav__button md-logo" aria-label="BriefML — Prédiction d'accidentologie" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    BriefML — Prédiction d'accidentologie
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TheMaxfly/alternance-CICDprediction" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TheMaxfly/alternance-CICDprediction
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Démarrage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/predictor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prédicteur
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Référence
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api_dictionary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dictionnaire API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dictionnaire des données
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dictionnaire des données
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#regle-de-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Règle de décision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables-dentree-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables d’entrée (15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#codes-et-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Codes et catégories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Codes et catégories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dep-departement-107-codes-observes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dep — Département (107 codes observés)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lum-conditions-declairage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lum — Conditions d’éclairage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atm-conditions-atmospheriques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        atm — Conditions atmosphériques
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agg-agglomeration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agg — Agglomération
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catr-categorie-de-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        catr — Catégorie de route
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#int-type-dintersection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int — Type d’intersection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#circ-regime-de-circulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        circ — Régime de circulation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#col-type-de-collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        col — Type de collision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manv_mode-manuvre-code-manv-baac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        manv_mode — Manœuvre (code manv BAAC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#choc_mode-point-de-choc-initial-code-choc-baac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        choc_mode — Point de choc initial (code choc BAAC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver_trajet_family-famille-de-trajet-conducteur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver_trajet_family — Famille de trajet conducteur
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver_age_bucket-classe-dage-conducteur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver_age_bucket — Classe d’âge conducteur
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vma_bucket-vitesse-maximale-autorisee-bucket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vma_bucket — Vitesse maximale autorisée (bucket)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catv_family_4-famille-de-vehicule-4-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        catv_family_4 — Famille de véhicule (4 classes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time_bucket-tranche-horaire-simplifiee-pour-lui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        time_bucket — Tranche horaire (simplifiée pour l’UI)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conseils-dimplementation-formulaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conseils d’implémentation (formulaire)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cicd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#regle-de-decision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Règle de décision
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variables-dentree-15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables d’entrée (15)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#codes-et-categories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Codes et catégories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Codes et catégories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dep-departement-107-codes-observes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dep — Département (107 codes observés)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lum-conditions-declairage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lum — Conditions d’éclairage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atm-conditions-atmospheriques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        atm — Conditions atmosphériques
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agg-agglomeration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        agg — Agglomération
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catr-categorie-de-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        catr — Catégorie de route
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#int-type-dintersection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int — Type d’intersection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#circ-regime-de-circulation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        circ — Régime de circulation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#col-type-de-collision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        col — Type de collision
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manv_mode-manuvre-code-manv-baac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        manv_mode — Manœuvre (code manv BAAC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#choc_mode-point-de-choc-initial-code-choc-baac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        choc_mode — Point de choc initial (code choc BAAC)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver_trajet_family-famille-de-trajet-conducteur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver_trajet_family — Famille de trajet conducteur
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#driver_age_bucket-classe-dage-conducteur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        driver_age_bucket — Classe d’âge conducteur
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vma_bucket-vitesse-maximale-autorisee-bucket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        vma_bucket — Vitesse maximale autorisée (bucket)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#catv_family_4-famille-de-vehicule-4-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        catv_family_4 — Famille de véhicule (4 classes)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#time_bucket-tranche-horaire-simplifiee-pour-lui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        time_bucket — Tranche horaire (simplifiée pour l’UI)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conseils-dimplementation-formulaire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conseils d’implémentation (formulaire)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="referentiel-dentree-modele-catboost-product15_v2-time_bucket-a-la-place-de-minute">Référentiel d’entrée — Modèle CatBoost (product15_v2 : <code>time_bucket</code> à la place de <code>minute</code>)</h1>
+<p>Ce document décrit <strong>les 15 variables</strong> conservées pour le modèle final, avec <strong>leur signification</strong> et <strong>les codes/catégories attendus</strong>.</p>
+<h2 id="regle-de-decision">Règle de décision</h2>
+<ul>
+<li>Le modèle renvoie une probabilité <code>proba</code> (0 à 1) d’<strong>accident grave</strong>.</li>
+<li><strong>Classe prédite</strong> : <code>grave</code> si <code>proba ≥ 0.47</code>, sinon <code>non_grave</code>.</li>
+</ul>
+<h2 id="variables-dentree-15">Variables d’entrée (15)</h2>
+<blockquote>
+<p>Conseil pratique : pour les variables “code BAAC”, saisir le <strong>code</strong> (ex. <code>lum=1</code>) ou proposer un menu déroulant avec le libellé.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type attendu</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dep</code></td>
+<td>catégorielle (string)</td>
+<td>Département (code INSEE/BAAC, ex. <code>59</code>, <code>75</code>, <code>2A</code>, <code>971</code>).</td>
+</tr>
+<tr>
+<td><code>lum</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Conditions d’éclairage (luminosité) au moment de l’accident.</td>
+</tr>
+<tr>
+<td><code>atm</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Conditions atmosphériques au moment de l’accident.</td>
+</tr>
+<tr>
+<td><code>catr</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Catégorie de route.</td>
+</tr>
+<tr>
+<td><code>agg</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Agglomération : accident en/hors agglomération.</td>
+</tr>
+<tr>
+<td><code>int</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Type d’intersection.</td>
+</tr>
+<tr>
+<td><code>circ</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Régime de circulation (sens unique, bidirectionnelle, etc.).</td>
+</tr>
+<tr>
+<td><code>col</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Type de collision.</td>
+</tr>
+<tr>
+<td><code>vma_bucket</code></td>
+<td>catégorielle (string)</td>
+<td>Classe de vitesse maximale autorisée (VMA) en km/h (regroupement).</td>
+</tr>
+<tr>
+<td><code>catv_family_4</code></td>
+<td>catégorielle (string)</td>
+<td>Famille de véhicule (regroupement en 4 classes).</td>
+</tr>
+<tr>
+<td><code>manv_mode</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Manœuvre (mode) : manœuvre la plus fréquente parmi les véhicules impliqués (en pratique, saisir la manœuvre du véhicule principal).</td>
+</tr>
+<tr>
+<td><code>driver_age_bucket</code></td>
+<td>catégorielle (string)</td>
+<td>Classe d’âge du conducteur (regroupement).</td>
+</tr>
+<tr>
+<td><code>choc_mode</code></td>
+<td>catégorielle (code numérique)</td>
+<td>Point de choc initial (mode) : point de choc le plus fréquent (en pratique, saisir le point de choc du véhicule principal).</td>
+</tr>
+<tr>
+<td><code>driver_trajet_family</code></td>
+<td>catégorielle (string)</td>
+<td>Famille du trajet conducteur (regroupement robuste des codes <code>trajet</code>).</td>
+</tr>
+<tr>
+<td><code>time_bucket</code></td>
+<td>catégorielle (string)</td>
+<td>Tranche horaire dérivée de <code>hour</code> (catégories UI simplifiées).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="codes-et-categories">Codes et catégories</h2>
+<h3 id="dep-departement-107-codes-observes"><code>dep</code> — Département (107 codes observés)</h3>
+<p>Saisir un code parmi :</p>
+<pre><code>01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15
+16, 17, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 2A, 2B
+30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44
+45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59
+60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74
+75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89
+90, 91, 92, 93, 94, 95, 971, 972, 973, 974, 975, 976, 977, 978, 986
+987, 988
+</code></pre>
+<h3 id="lum-conditions-declairage"><code>lum</code> — Conditions d’éclairage</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Plein jour</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Crépuscule ou aube</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Nuit sans éclairage public</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Nuit avec éclairage public non allumé</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Nuit avec éclairage public allumé</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Valeurs manquantes : dans les données brutes, <code>lum</code> peut être absent. Dans l’app, prévoir “Non renseigné” si l’utilisateur ne sait pas.</p>
+</blockquote>
+<h3 id="atm-conditions-atmospheriques"><code>atm</code> — Conditions atmosphériques</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>-1</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Normale</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Pluie légère</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Pluie forte</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Neige / grêle</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Brouillard / fumée</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>6</code></td>
+<td>Vent fort / tempête</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>7</code></td>
+<td>Temps éblouissant</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>8</code></td>
+<td>Temps couvert</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>9</code></td>
+<td>Autre</td>
+</tr>
+</tbody>
+</table>
+<h3 id="agg-agglomeration"><code>agg</code> — Agglomération</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Hors agglomération</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>En agglomération</td>
+</tr>
+</tbody>
+</table>
+<h3 id="catr-categorie-de-route"><code>catr</code> — Catégorie de route</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Autoroute</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Route nationale</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Route départementale</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Voie communale</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Hors réseau public</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>6</code></td>
+<td>Parc de stationnement ouvert à la circulation publique</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>7</code></td>
+<td>Routes de métropole urbaine</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>9</code></td>
+<td>Autre</td>
+</tr>
+</tbody>
+</table>
+<h3 id="int-type-dintersection"><code>int</code> — Type d’intersection</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Hors intersection</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Intersection en X</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Intersection en T</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Intersection en Y</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Intersection à plus de 4 branches</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>6</code></td>
+<td>Giratoire</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>7</code></td>
+<td>Place</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>8</code></td>
+<td>Passage à niveau</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>9</code></td>
+<td>Autre intersection</td>
+</tr>
+</tbody>
+</table>
+<h3 id="circ-regime-de-circulation"><code>circ</code> — Régime de circulation</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>-1</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Sens unique</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Bidirectionnelle</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Chaussées séparées</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Voies d’affectation variable</td>
+</tr>
+</tbody>
+</table>
+<h3 id="col-type-de-collision"><code>col</code> — Type de collision</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>-1</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>2 véhicules - frontale</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>2 véhicules - par l’arrière</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>2 véhicules - par le côté</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>3+ véhicules - en chaîne</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>3+ véhicules - collisions multiples</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>6</code></td>
+<td>Autre collision</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>7</code></td>
+<td>Sans collision</td>
+</tr>
+</tbody>
+</table>
+<h3 id="manv_mode-manuvre-code-manv-baac"><code>manv_mode</code> — Manœuvre (code <code>manv</code> BAAC)</h3>
+<p>Dans le dataset, c’est le <strong>mode</strong> (valeur la plus fréquente) des manœuvres des véhicules impliqués. Pour un formulaire utilisateur, on peut demander <strong>la manœuvre du véhicule principal</strong>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>-1</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>0</code></td>
+<td>Inconnue</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Sans changement de direction</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Même sens, même file</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Entre 2 files</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Marche arrière</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Contresens</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>6</code></td>
+<td>Franchissant TPC</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>7</code></td>
+<td>Couloir bus même sens</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>8</code></td>
+<td>Couloir bus sens inverse</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>9</code></td>
+<td>S’insérant</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>10</code></td>
+<td>Demi-tour sur chaussée</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>11</code></td>
+<td>Change file gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>12</code></td>
+<td>Change file droite</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>13</code></td>
+<td>Déporté gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>14</code></td>
+<td>Déporté droite</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>15</code></td>
+<td>Tournant gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>16</code></td>
+<td>Tournant droite</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>17</code></td>
+<td>Dépassant gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>18</code></td>
+<td>Dépassant droite</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>19</code></td>
+<td>Traversant chaussée</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>20</code></td>
+<td>Stationnement</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>21</code></td>
+<td>Évitement</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>22</code></td>
+<td>Ouverture de porte</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>23</code></td>
+<td>Arrêté (hors stationnement)</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>24</code></td>
+<td>En stationnement (avec occupants)</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>25</code></td>
+<td>Circulant sur trottoir</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>26</code></td>
+<td>Autres manœuvres</td>
+</tr>
+</tbody>
+</table>
+<h3 id="choc_mode-point-de-choc-initial-code-choc-baac"><code>choc_mode</code> — Point de choc initial (code <code>choc</code> BAAC)</h3>
+<p>Dans le dataset, c’est le <strong>mode</strong> (valeur la plus fréquente) des points de choc initiaux des véhicules impliqués. Pour un formulaire utilisateur, on peut demander <strong>le point de choc du véhicule principal</strong>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>-1</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>0</code></td>
+<td>Aucun</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Avant</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Avant droit</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Avant gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Arrière</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Arrière droit</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>6</code></td>
+<td>Arrière gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>7</code></td>
+<td>Côté droit</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>8</code></td>
+<td>Côté gauche</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>9</code></td>
+<td>Chocs multiples / tonneaux</td>
+</tr>
+</tbody>
+</table>
+<h3 id="driver_trajet_family-famille-de-trajet-conducteur"><code>driver_trajet_family</code> — Famille de trajet conducteur</h3>
+<p>Cette feature regroupe les codes <code>trajet</code> sous la forme <code>trajet_&lt;code&gt;</code>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>trajet_1</code></td>
+<td>Domicile–travail</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>trajet_2</code></td>
+<td>Domicile–école</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>trajet_3</code></td>
+<td>Courses–achats</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>trajet_4</code></td>
+<td>Utilisation professionnelle</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>trajet_5</code></td>
+<td>Promenade–loisirs</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>trajet_9</code></td>
+<td>Autre</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>unknown</code></td>
+<td>Non renseigné / inconnu</td>
+</tr>
+</tbody>
+</table>
+<p>Référence codes BAAC <code>trajet</code> (si tu veux aussi l’afficher tel quel) :</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>-1</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>0</code></td>
+<td>Non renseigné</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>1</code></td>
+<td>Domicile–travail</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2</code></td>
+<td>Domicile–école</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>3</code></td>
+<td>Courses–achats</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>4</code></td>
+<td>Utilisation professionnelle</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>5</code></td>
+<td>Promenade–loisirs</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>9</code></td>
+<td>Autre</td>
+</tr>
+</tbody>
+</table>
+<h3 id="driver_age_bucket-classe-dage-conducteur"><code>driver_age_bucket</code> — Classe d’âge conducteur</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>&lt;18</code></td>
+<td>Moins de 18 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>18-24</code></td>
+<td>18 à 24 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>25-34</code></td>
+<td>25 à 34 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>35-44</code></td>
+<td>35 à 44 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>45-54</code></td>
+<td>45 à 54 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>55-64</code></td>
+<td>55 à 64 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>65-74</code></td>
+<td>65 à 74 ans</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>75+</code></td>
+<td>75 ans et plus</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>unknown</code></td>
+<td>Âge inconnu / non renseigné</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Remarque : en pratique, tu peux demander l’<strong>âge en années</strong> et convertir en bucket côté code.</p>
+</blockquote>
+<h3 id="vma_bucket-vitesse-maximale-autorisee-bucket"><code>vma_bucket</code> — Vitesse maximale autorisée (bucket)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>&lt;=30</code></td>
+<td>≤ 30 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>31-50</code></td>
+<td>31 à 50 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>51-80</code></td>
+<td>51 à 80 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>81-90</code></td>
+<td>81 à 90 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>91-110</code></td>
+<td>91 à 110 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>111-130</code></td>
+<td>111 à 130 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>&gt;130</code></td>
+<td>&gt; 130 km/h</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>inconnue</code></td>
+<td>VMA inconnue / non renseignée</td>
+</tr>
+</tbody>
+</table>
+<h3 id="catv_family_4-famille-de-vehicule-4-classes"><code>catv_family_4</code> — Famille de véhicule (4 classes)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Code</th>
+<th>Libellé</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><code>voitures_utilitaires</code></td>
+<td>Voitures particulières + utilitaires légers (incl. camionnettes).</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>2rm_3rm</code></td>
+<td>Deux-roues / trois-roues motorisés (motos, scooters, cyclomoteurs…).</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>lourds_tc_agri_autres</code></td>
+<td>Poids lourds + transport en commun + agricoles/spéciaux/autres.</td>
+</tr>
+<tr>
+<td style="text-align: right;"><code>vulnerables</code></td>
+<td>Usagers/engins vulnérables (ex. vélos, EDPM…) regroupés côté véhicule.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Note : ce regroupement dépend du mapping réalisé dans le feature engineering à partir de <code>catv</code> (catégorie véhicule BAAC).</p>
+</blockquote>
+<h3 id="time_bucket-tranche-horaire-simplifiee-pour-lui"><code>time_bucket</code> — Tranche horaire (simplifiée pour l’UI)</h3>
+<p>Variable <strong>catégorielle</strong> dérivée de l’heure (<code>hour</code>) afin d’éviter de demander une heure/minute précises.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Libellé</th>
+<th>Plage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>night_00_05</code></td>
+<td>Nuit</td>
+<td>00:00–05:59</td>
+</tr>
+<tr>
+<td><code>morning_06_11</code></td>
+<td>Matin</td>
+<td>06:00–11:59</td>
+</tr>
+<tr>
+<td><code>afternoon_12_17</code></td>
+<td>Après‑midi</td>
+<td>12:00–17:59</td>
+</tr>
+<tr>
+<td><code>evening_18_23</code></td>
+<td>Soir</td>
+<td>18:00–23:59</td>
+</tr>
+<tr>
+<td><strong>Exemple</strong> : si l’heure est <code>05:40</code>, alors <code>time_bucket = night_00_05</code>.</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="conseils-dimplementation-formulaire">Conseils d’implémentation (formulaire)</h2>
+<ul>
+<li>Utiliser des <strong>menus déroulants</strong> pour les variables codées (lum, atm, catr, agg, int, circ, col, manv_mode, choc_mode).</li>
+<li>Accepter une option “Non renseigné” (souvent <code>-1</code> ou <code>unknown</code>).</li>
+<li>Pour <code>time_bucket</code>, proposer 4 choix simples (Nuit/Matin/Après‑midi/Soir) sans option “Non renseigné”.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

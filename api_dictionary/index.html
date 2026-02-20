@@ -1,0 +1,1161 @@
+
+<!doctype html>
+<html lang="fr" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="API de prédiction de la gravité des accidents de la route (CatBoost + FastAPI + Streamlit)">
+      
+      
+        <meta name="author" content="TheMaxfly">
+      
+      
+        <link rel="canonical" href="https://themaxfly.github.io/alternance-CICDprediction/api_dictionary/">
+      
+      
+        <link rel="prev" href="../api/predictor/">
+      
+      
+        <link rel="next" href="../data_dictionary/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
+    
+    
+      
+        <title>Dictionnaire API - BriefML — Prédiction d'accidentologie</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-data-dictionary-accidents_model_readycsv-model-ready" class="md-skip">
+          Aller au contenu
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="En-tête">
+    <a href=".." title="BriefML — Prédiction d&#39;accidentologie" class="md-header__button md-logo" aria-label="BriefML — Prédiction d'accidentologie" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            BriefML — Prédiction d'accidentologie
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Dictionnaire API
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-label="Mode sombre"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Mode sombre" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-label="Mode clair"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Mode clair" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Rechercher" placeholder="Rechercher" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Recherche">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Effacer" aria-label="Effacer" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initialisation de la recherche
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TheMaxfly/alternance-CICDprediction" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TheMaxfly/alternance-CICDprediction
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Onglets" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Accueil
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Démarrage
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api/predictor/" class="md-tabs__link">
+          
+  
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  Référence
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cicd/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CI/CD
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../changelog/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Changelog
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="BriefML — Prédiction d&#39;accidentologie" class="md-nav__button md-logo" aria-label="BriefML — Prédiction d'accidentologie" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    BriefML — Prédiction d'accidentologie
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TheMaxfly/alternance-CICDprediction" title="Aller au dépôt" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TheMaxfly/alternance-CICDprediction
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Accueil
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Démarrage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/predictor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prédicteur
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Référence
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Référence
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dictionnaire API
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dictionnaire API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objectif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-json-schema-draft-2020-12-request-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) JSON Schema (Draft 2020-12) — Request / Response
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1) JSON Schema (Draft 2020-12) — Request / Response">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-request-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Request (Batch)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_dictionary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dictionnaire des données
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cicd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table des matières">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table des matières
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#objectif" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectif
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-json-schema-draft-2020-12-request-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1) JSON Schema (Draft 2020-12) — Request / Response
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1) JSON Schema (Draft 2020-12) — Request / Response">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-request-batch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Request (Batch)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="api-data-dictionary-accidents_model_readycsv-model-ready">API Data Dictionary — accidents_model_ready.csv (Model-Ready)</h1>
+<h2 id="objectif">Objectif</h2>
+<p>Ce schéma décrit le format <strong>attendu par le modèle</strong> pour prédire la cible <code>grave</code> à partir d’une ligne "accident-level" feature-engineered.</p>
+<ul>
+<li>Granularité : 1 enregistrement = 1 accident (<code>Num_Acc</code> unique).</li>
+<li>Période d’entraînement : 2022–2024.</li>
+<li>Cible d’entraînement (non fournie à l’inférence) : <code>grave</code>.</li>
+<li><code>grave = 1</code> : accident grave (au moins 1 tué ou blessé hospitalisé)</li>
+<li><code>grave = 0</code> : accident non grave (au pire blessé léger)<blockquote>
+<p>Remarque : en accident-level BAAC, il n’y a généralement pas de classe “tous indemnes”.</p>
+</blockquote>
+</li>
+</ul>
+<hr />
+<h2 id="1-json-schema-draft-2020-12-request-response">1) JSON Schema (Draft 2020-12) — Request / Response</h2>
+<h3 id="11-request-batch">1.1 Request (Batch)</h3>
+<ul>
+<li>Endpoint (exemple) : <code>POST /predict</code></li>
+<li>Le serveur accepte un batch (<code>records</code>) et retourne un batch de prédictions.</li>
+</ul>
+<p>```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/accident-model-ready-request.json",
+  "title": "AccidentModelReadyBatchRequest",
+  "type": "object",
+  "required": ["records"],
+  "properties": {
+    "model_version": { "type": "string" },
+    "records": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/AccidentModelReadyRecord" }
+    }
+  },
+  "$defs": {
+    "AccidentModelReadyRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Num_Acc": { "type": ["integer","string"], "description": "Identifiant accident (optionnel côté API, utile pour tracer la prédiction)." },</p>
+<pre><code>    "jour": { "type": ["integer","null"], "minimum": 1, "maximum": 31 },
+    "mois": { "type": ["integer","null"], "minimum": 1, "maximum": 12 },
+    "an":   { "type": ["integer","null"], "minimum": 2005, "maximum": 2100 },
+
+    "hrmn": { "type": ["string","null"], "description": "Heure brute BAAC (ex: '0830')." },
+
+    "lum": { "type": ["integer","null"], "enum": [1,2,3,4,5], "description": "Luminosité BAAC." },
+    "dep": { "type": ["string","null"], "description": "Département (code INSEE, ex: '59', '2A')." },
+    "com": { "type": ["string","null"], "description": "Commune (code INSEE)." },
+    "agg": { "type": ["integer","null"], "description": "Agglomération BAAC (souvent 1/2)." },
+    "int": { "type": ["integer","null"], "description": "Intersection BAAC (codes)." },
+    "atm": { "type": ["integer","null"], "enum": [1,2,3,4,5,6,7,8,9], "description": "Conditions atmosphériques BAAC." },
+    "col": { "type": ["integer","null"], "description": "Type de collision BAAC (codes)." },
+
+    "adr":  { "type": ["string","null"], "description": "Adresse (souvent partielle)." },
+    "lat":  { "type": ["number","null"], "minimum": -90, "maximum": 90 },
+    "long": { "type": ["number","null"], "minimum": -180, "maximum": 180 },
+    "gps_valid": { "type": ["integer","null"], "enum": [0,1], "description": "1 si GPS validé après nettoyage." },
+
+    "hour":   { "type": ["integer","null"], "minimum": 0, "maximum": 23 },
+    "time_bucket": {
+      "type": ["string","null"],
+      "enum": ["night_00_05", "morning_06_11", "afternoon_12_17", "evening_18_23"],
+      "description": "Tranche horaire (00–05 night_00_05, 06–11 morning_06_11, 12–17 afternoon_12_17, 18–23 evening_18_23)."
+    },
+    "date":   { "type": ["string","null"], "format": "date-time", "description": "Timestamp reconstruit." },
+
+    "n_lieux_rows": { "type": ["integer","null"], "minimum": 1, "description": "Nb de lignes LIEUX agrégées." },
+    "catr": { "type": ["number","null"], "description": "Catégorie route BAAC (codes)." },
+    "voie": { "type": ["string","null"], "description": "Numéro de voie (forte cardinalité)." },
+    "v1":   { "type": ["number","null"], "description": "Indice route (bis/ter...)."},
+    "circ": { "type": ["number","null"], "description": "Régime circulation BAAC (codes)." },
+    "nbv":  { "type": ["number","null"], "description": "Nombre de voies." },
+    "vosp": { "type": ["number","null"], "description": "Voie réservée BAAC (codes)." },
+    "prof": { "type": ["number","null"], "description": "Profil BAAC (codes)." },
+    "pr":   { "type": ["number","null"], "description": "PR." },
+    "pr1":  { "type": ["number","null"], "description": "Distance au PR." },
+    "plan": { "type": ["number","null"], "description": "Tracé en plan BAAC (codes)." },
+    "larrout": { "type": ["number","null"], "description": "Largeur chaussée (souvent manquant)." },
+    "surf": { "type": ["number","null"], "description": "État surface BAAC (codes)." },
+    "infra": { "type": ["number","null"], "description": "Infrastructure BAAC (codes)." },
+    "situ": { "type": ["number","null"], "description": "Situation BAAC (codes)." },
+    "vma":  { "type": ["number","null"], "minimum": 10, "maximum": 200, "description": "Vitesse max autorisée (km/h), nettoyée." },
+
+    "nb_vehicules": { "type": ["integer","null"], "minimum": 1 },
+    "catv_mode": { "type": ["number","null"], "description": "Catégorie véhicule (mode) BAAC." },
+    "motor_mode": { "type": ["number","null"], "description": "Motorisation (mode) BAAC." },
+    "senc_mode":  { "type": ["number","null"], "description": "Sens (mode) BAAC." },
+    "choc_mode":  { "type": ["number","null"], "description": "Point de choc (mode) BAAC." },
+    "manv_mode":  { "type": ["number","null"], "description": "Manœuvre (mode) BAAC." },
+
+    "catv_family_4": {
+      "type": ["string","null"],
+      "enum": ["vulnerables","2rm_3rm","voitures_utilitaires","lourds_tc_agri_autres"]
+    },
+
+    "obs_mode": { "type": ["number","null"], "description": "Obstacle fixe (mode) BAAC." },
+    "obs_family_mode": {
+      "type": ["string","null"],
+      "enum": ["sans_objet_ou_nr","vehicule_stationnement","infrastructure_urbain","nature_terrain_sortie"]
+    },
+    "any_obs_fixed": { "type": ["integer","null"], "enum": [0,1] },
+    "any_sortie_chaussee": { "type": ["integer","null"], "enum": [0,1] },
+    "any_tree": { "type": ["integer","null"], "enum": [0,1] },
+    "obs_mode_nonzero": { "type": ["number","null"], "description": "Obstacle mode en excluant 0 (sans objet)." },
+    "obs_family_mode_nonzero": {
+      "type": ["string","null"],
+      "enum": ["vehicule_stationnement","infrastructure_urbain","nature_terrain_sortie"]
+    },
+
+    "nb_drivers": { "type": ["integer","null"], "minimum": 0 },
+    "driver_sex_mode": { "type": ["integer","null"], "enum": [1,2], "description": "1=Homme, 2=Femme (mode conducteur)." },
+    "any_female_driver": { "type": ["integer","null"], "enum": [0,1] },
+    "any_male_driver": { "type": ["integer","null"], "enum": [0,1] },
+    "female_driver_share": { "type": ["number","null"], "minimum": 0, "maximum": 1 },
+
+    "driver_age_mean": { "type": ["number","null"], "minimum": 14, "maximum": 110 },
+    "driver_age_median": { "type": ["number","null"], "minimum": 14, "maximum": 110 },
+    "driver_age_min": { "type": ["number","null"], "minimum": 14, "maximum": 110 },
+    "driver_age_max": { "type": ["number","null"], "minimum": 14, "maximum": 110 },
+
+    "driver_trajet_mode": { "type": ["integer","null"], "description": "Trajet conducteur (code BAAC) mode." },
+    "driver_info_missing": { "type": ["integer","null"], "enum": [0,1] },
+
+    "driver_age_bucket": {
+      "type": ["string","null"],
+      "enum": ["&lt;18","18-24","25-34","35-44","45-54","55-64","65-74","75+","unknown"]
+    },
+    "driver_trajet_family": {
+      "type": ["string","null"],
+      "enum": ["trajet_1","trajet_2","trajet_3","trajet_4","trajet_5","trajet_9","unknown"]
+    },
+
+    "dow": { "type": ["integer","null"], "minimum": 0, "maximum": 6 },
+    "is_weekend": { "type": ["integer","null"], "enum": [0,1] },
+    "time_bucket": { "type": ["string","null"], "enum": ["night_00_05","morning_06_11","afternoon_12_17","evening_18_23"] },
+    "is_rush_hour": { "type": ["integer","null"], "enum": [0,1] },
+    "season": { "type": ["string","null"], "enum": ["hiver","printemps","ete","automne"] },
+
+    "hour_sin": { "type": ["number","null"] },
+    "hour_cos": { "type": ["number","null"] },
+    "month_sin": { "type": ["number","null"] },
+    "month_cos": { "type": ["number","null"] },
+
+    "lat_grid_2": { "type": ["number","null"] },
+    "long_grid_2": { "type": ["number","null"] },
+    "geo_cell_2": { "type": ["string","null"], "description": "Cellule géo ~1km (catégorielle)." },
+    "lat_grid_3": { "type": ["number","null"] },
+    "long_grid_3": { "type": ["number","null"] },
+    "geo_cell_3": { "type": ["string","null"], "description": "Cellule géo ~100m (catégorielle)." },
+
+    "vma_bucket": {
+      "type": ["string","null"],
+      "enum": ["&lt;=30","31-50","51-80","81-90","91-110","111-130","&gt;130","inconnue"]
+    },
+    "is_high_speed": { "type": ["integer","null"], "enum": [0,1] },
+    "is_urban_speed": { "type": ["integer","null"], "enum": [0,1] },
+    "is_single_vehicle": { "type": ["integer","null"], "enum": [0,1] },
+    "is_multi_vehicle": { "type": ["integer","null"], "enum": [0,1] },
+    "veh_bucket": { "type": ["string","null"], "enum": ["1","2","3","4+"] },
+
+    "obs_fixed_x_highspeed": { "type": ["integer","null"], "enum": [0,1] },
+    "tree_x_highspeed": { "type": ["integer","null"], "enum": [0,1] },
+    "sortie_x_singleveh": { "type": ["integer","null"], "enum": [0,1] },
+    "has_obs_nonzero": { "type": ["integer","null"], "enum": [0,1] },
+
+    "atm_num": { "type": ["integer","null"], "enum": [1,2,3,4,5,6,7,8,9] },
+    "lum_num": { "type": ["integer","null"], "enum": [1,2,3,4,5] },
+
+    "atm_label": {
+      "type": ["string","null"],
+      "enum": ["normale","pluie_legere","pluie_forte","neige_grele","brouillard_fumee","vent_fort_tempete","temps_eblouissant","temps_couvert","autre"]
+    },
+    "lum_label": {
+      "type": ["string","null"],
+      "enum": ["plein_jour","crepuscule_aube","nuit_sans_eclairage","nuit_eclairage_non_allume","nuit_eclairage_allume"]
+    },
+    "atm_family": {
+      "type": ["string","null"],
+      "enum": ["normal","pluie","neige_grele","brouillard_fumee","vent_tempete","eblouissant","couvert","autre"]
+    },
+    "lum_family": {
+      "type": ["string","null"],
+      "enum": ["jour","crepuscule","nuit"]
+    },
+
+    "is_night": { "type": ["integer","null"], "enum": [0,1] },
+    "is_twilight": { "type": ["integer","null"], "enum": [0,1] },
+    "is_daylight": { "type": ["integer","null"], "enum": [0,1] },
+
+    "is_rain": { "type": ["integer","null"], "enum": [0,1] },
+    "is_fog": { "type": ["integer","null"], "enum": [0,1] },
+    "is_snow_hail": { "type": ["integer","null"], "enum": [0,1] },
+    "is_storm_wind": { "type": ["integer","null"], "enum": [0,1] },
+    "is_glare": { "type": ["integer","null"], "enum": [0,1] },
+    "is_overcast": { "type": ["integer","null"], "enum": [0,1] },
+
+    "night_x_rain": { "type": ["integer","null"], "enum": [0,1] },
+    "night_x_fog": { "type": ["integer","null"], "enum": [0,1] }
+  }
+}
+</code></pre>
+<p>}
+}</p>
+<p>"""Response (Batch)</p>
+<p>{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/accident-model-ready-response.json",
+  "title": "AccidentModelReadyBatchResponse",
+  "type": "object",
+  "required": ["predictions"],
+  "properties": {
+    "model_version": { "type": "string" },
+    "predictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["grave_pred", "grave_proba"],
+        "properties": {
+          "Num_Acc": { "type": ["integer","string","null"] },
+          "grave_pred": { "type": "integer", "enum": [0,1] },
+          "grave_proba": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    }
+  }
+}</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "search.suggest", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copi\u00e9 dans le presse-papier", "clipboard.copy": "Copier dans le presse-papier", "search.result.more.one": "1 de plus sur cette page", "search.result.more.other": "# de plus sur cette page", "search.result.none": "Aucun document trouv\u00e9", "search.result.one": "1 document trouv\u00e9", "search.result.other": "# documents trouv\u00e9s", "search.result.placeholder": "Taper pour d\u00e9marrer la recherche", "search.result.term.missing": "Non trouv\u00e9", "select.version": "S\u00e9lectionner la version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
