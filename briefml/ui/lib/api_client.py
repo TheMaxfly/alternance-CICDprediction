@@ -11,6 +11,7 @@ import logging
 import os
 import time
 from typing import Any
+
 import requests
 from requests.exceptions import RequestException, Timeout
 
@@ -47,7 +48,7 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
             PREDICT_ENDPOINT,
             json={"data": inputs},
             timeout=REQUEST_TIMEOUT,
-            headers={"Content-Type": "application/json", "Accept": "application/json"}
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
         )
         response_time_ms = (time.time() - start_time) * 1000
 
@@ -56,7 +57,8 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
             # Success - normalize response to standard keys
             logger.info(
                 "Prediction API call: status=%d, response_time_ms=%.1f",
-                response.status_code, response_time_ms
+                response.status_code,
+                response_time_ms,
             )
             raw = response.json()
             return {
@@ -69,7 +71,8 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
             # Validation error - parse field errors
             logger.warning(
                 "Prediction API validation error: status=%d, response_time_ms=%.1f",
-                response.status_code, response_time_ms
+                response.status_code,
+                response_time_ms,
             )
             error_data = response.json()
             details = error_data.get("detail", [])
@@ -85,14 +88,15 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
                 "error": "validation",
                 "message": "Les données saisies sont invalides.",
                 "details": details,
-                "formatted_errors": error_messages
+                "formatted_errors": error_messages,
             }
 
         elif response.status_code >= 500:
             # Server error
             logger.error(
                 "Prediction API server error: status=%d, response_time_ms=%.1f",
-                response.status_code, response_time_ms
+                response.status_code,
+                response_time_ms,
             )
             error_data = response.json() if response.text else {}
             detail = error_data.get("detail", "Erreur serveur inconnue")
@@ -100,41 +104,44 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
             return {
                 "error": "server",
                 "message": f"Une erreur s'est produite côté serveur: {detail}",
-                "status_code": response.status_code
+                "status_code": response.status_code,
             }
 
         else:
             # Other HTTP errors
             logger.warning(
                 "Prediction API unexpected status: status=%d, response_time_ms=%.1f",
-                response.status_code, response_time_ms
+                response.status_code,
+                response_time_ms,
             )
             return {
                 "error": "http",
                 "message": f"Erreur HTTP {response.status_code}",
-                "status_code": response.status_code
+                "status_code": response.status_code,
             }
 
     except Timeout:
         # Request timeout
         response_time_ms = (time.time() - start_time) * 1000
-        logger.error(
-            "Prediction API timeout after %.1f ms", response_time_ms
-        )
+        logger.error("Prediction API timeout after %.1f ms", response_time_ms)
         return {
             "error": "timeout",
-            "message": "Le service met trop de temps à répondre (>10s). Veuillez réessayer dans quelques instants."
+            "message": (
+                "Le service met trop de temps à répondre (>10s)."
+                " Veuillez réessayer dans quelques instants."
+            ),
         }
 
     except ConnectionError:
         # Connection failed
         response_time_ms = (time.time() - start_time) * 1000
-        logger.error(
-            "Prediction API connection error after %.1f ms", response_time_ms
-        )
+        logger.error("Prediction API connection error after %.1f ms", response_time_ms)
         return {
             "error": "connection",
-            "message": "Impossible de se connecter au service de prédiction. Vérifiez que l'API est démarrée."
+            "message": (
+                "Impossible de se connecter au service de prédiction."
+                " Vérifiez que l'API est démarrée."
+            ),
         }
 
     except RequestException as e:
@@ -142,11 +149,12 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
         response_time_ms = (time.time() - start_time) * 1000
         logger.error(
             "Prediction API network error after %.1f ms: %s",
-            response_time_ms, type(e).__name__
+            response_time_ms,
+            type(e).__name__,
         )
         return {
             "error": "network",
-            "message": f"Service temporairement indisponible: {str(e)}"
+            "message": f"Service temporairement indisponible: {str(e)}",
         }
 
     except Exception as e:
@@ -154,12 +162,10 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
         response_time_ms = (time.time() - start_time) * 1000
         logger.error(
             "Prediction API unexpected error after %.1f ms: %s",
-            response_time_ms, type(e).__name__
+            response_time_ms,
+            type(e).__name__,
         )
-        return {
-            "error": "unknown",
-            "message": f"Erreur inattendue: {str(e)}"
-        }
+        return {"error": "unknown", "message": f"Erreur inattendue: {str(e)}"}
 
 
 def is_success_response(response: dict[str, Any]) -> bool:

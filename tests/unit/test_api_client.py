@@ -8,12 +8,9 @@ Tests:
 """
 
 import logging
-import json
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-import pytest
 from briefml.ui.lib.api_client import call_predict_api
-
 
 # Sample valid inputs for testing
 SAMPLE_INPUTS = {
@@ -31,7 +28,7 @@ SAMPLE_INPUTS = {
     "driver_age_bucket": "25-34",
     "choc_mode": 1,
     "driver_trajet_family": "trajet_1",
-    "time_bucket": "morning_06_11"
+    "time_bucket": "morning_06_11",
 }
 
 
@@ -46,7 +43,7 @@ class TestUS12Logging:
         mock_response.json.return_value = {
             "probability": 0.68,
             "prediction": "grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
         mock_post.return_value = mock_response
 
@@ -79,6 +76,7 @@ class TestUS12Logging:
     def test_timeout_logs_timeout_error(self, mock_post, caplog):
         """Timeout is logged as an error."""
         from requests.exceptions import Timeout
+
         mock_post.side_effect = Timeout("Connection timed out")
 
         with caplog.at_level(logging.INFO, logger="briefml.ui.lib.api_client"):
@@ -96,7 +94,7 @@ class TestUS12Logging:
         mock_response.json.return_value = {
             "probability": 0.68,
             "prediction": "grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
         mock_post.return_value = mock_response
 
@@ -109,8 +107,9 @@ class TestUS12Logging:
             # Skip generic values that might appear as part of other content
             if isinstance(field_value, int) and field_value in (1, 2, 3):
                 continue
-            assert str(field_value) not in log_text or field_name not in log_text, \
+            assert str(field_value) not in log_text or field_name not in log_text, (
                 f"User data '{field_name}={field_value}' found in logs"
+            )
 
     @patch("briefml.ui.lib.api_client.requests.post")
     def test_log_contains_response_time(self, mock_post, caplog):
@@ -120,7 +119,7 @@ class TestUS12Logging:
         mock_response.json.return_value = {
             "probability": 0.68,
             "prediction": "grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
         mock_post.return_value = mock_response
 
@@ -137,7 +136,9 @@ class TestUS12Logging:
         mock_response = MagicMock()
         mock_response.status_code = 422
         mock_response.json.return_value = {
-            "detail": [{"loc": ["body", "lum"], "msg": "invalid", "type": "value_error"}]
+            "detail": [
+                {"loc": ["body", "lum"], "msg": "invalid", "type": "value_error"}
+            ]
         }
         mock_post.return_value = mock_response
 

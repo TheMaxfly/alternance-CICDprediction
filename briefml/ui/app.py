@@ -2,7 +2,8 @@
 Streamlit app for accident severity prediction.
 
 This is the main entry point for the Streamlit interface.
-It provides a multi-page form to collect 15 input variables and call the FastAPI prediction endpoint.
+It provides a multi-page form to collect 15 input variables
+and call the FastAPI prediction endpoint.
 
 Architecture:
 - Uses briefml.ui.lib modules for session state, validation, and API calls
@@ -11,14 +12,16 @@ Architecture:
 """
 
 import logging
+
 import streamlit as st
+
 from briefml.ui.lib import reference_loader, session_state
 
 # Configure logging (T095)
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 
@@ -27,7 +30,7 @@ st.set_page_config(
     page_title="Prediction de Gravite d'Accidents",
     page_icon="🚗",
     layout="centered",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 
@@ -71,23 +74,41 @@ with st.sidebar:
     if completion:
         st.success("Formulaire complet")
     else:
-        filled_count = len([
-            f for f in [
-                "dep", "lum", "atm", "catr", "agg", "int", "circ",
-                "col", "vma_bucket", "catv_family_4", "manv_mode",
-                "driver_age_bucket", "choc_mode", "driver_trajet_family", "time_bucket"
+        filled_count = len(
+            [
+                f
+                for f in [
+                    "dep",
+                    "lum",
+                    "atm",
+                    "catr",
+                    "agg",
+                    "int",
+                    "circ",
+                    "col",
+                    "vma_bucket",
+                    "catv_family_4",
+                    "manv_mode",
+                    "driver_age_bucket",
+                    "choc_mode",
+                    "driver_trajet_family",
+                    "time_bucket",
+                ]
+                if session_state.get_prediction_input(f) is not None
             ]
-            if session_state.get_prediction_input(f) is not None
-        ])
+        )
         st.info(f"{filled_count}/15 champs remplis")
 
 
 # Main content area
 st.title("Prediction de Gravite d'Accidents")
-st.caption("Interface Streamlit pour la prediction de la gravite des accidents de la route")
+st.caption(
+    "Interface Streamlit pour la prediction de la gravite des accidents de la route"
+)
 
 # Import page render functions (numeric-prefixed filenames require importlib)
-import importlib
+import importlib  # noqa: E402
+
 _page1 = importlib.import_module("briefml.ui.pages.1_Contexte_Route")
 _page2 = importlib.import_module("briefml.ui.pages.2_Infrastructure")
 _page3 = importlib.import_module("briefml.ui.pages.3_Collision")

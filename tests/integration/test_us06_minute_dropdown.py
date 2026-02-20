@@ -8,8 +8,8 @@ Tests verify that:
 """
 
 import pytest
-from briefml.ui.lib import reference_loader
 
+from briefml.ui.lib import reference_loader
 
 pytestmark = pytest.mark.integration
 
@@ -31,7 +31,7 @@ class TestUS06TimeBucketDropdown:
         Then: Uses st.selectbox (not st.number_input or st.text_input)
         """
         # Read the page 5 source file
-        with open("streamlit_pages/5_Conditions.py", "r") as f:
+        with open("streamlit_pages/5_Conditions.py") as f:
             source = f.read()
 
         # Assert: time_bucket uses st.selectbox
@@ -42,10 +42,12 @@ class TestUS06TimeBucketDropdown:
         lines = source.split("\n")
         time_bucket_lines = [line for line in lines if "time_bucket" in line.lower()]
         for line in time_bucket_lines:
-            assert "st.text_input" not in line, \
+            assert "st.text_input" not in line, (
                 f"time_bucket should NOT use st.text_input: {line}"
-            assert "st.number_input" not in line, \
+            )
+            assert "st.number_input" not in line, (
                 f"time_bucket should NOT use st.number_input: {line}"
+            )
 
     def test_time_bucket_dropdown_has_4_options(self):
         """
@@ -56,8 +58,9 @@ class TestUS06TimeBucketDropdown:
         Then: Has exactly 4 options
         """
         time_bucket_options = self.ref_data["time_bucket"]
-        assert len(time_bucket_options) == 4, \
+        assert len(time_bucket_options) == 4, (
             f"time_bucket should have 4 options, got {len(time_bucket_options)}"
+        )
 
     def test_time_bucket_options_cover_expected_values(self):
         """
@@ -67,16 +70,21 @@ class TestUS06TimeBucketDropdown:
         When: Checking all code values
         Then: Contains exactly night_00_05, morning_06_11, afternoon_12_17, evening_18_23
         """
-        time_bucket_codes = sorted([opt["code"] for opt in self.ref_data["time_bucket"]])
-        expected_codes = sorted([
-            "night_00_05",
-            "morning_06_11",
-            "afternoon_12_17",
-            "evening_18_23",
-        ])
+        time_bucket_codes = sorted(
+            [opt["code"] for opt in self.ref_data["time_bucket"]]
+        )
+        expected_codes = sorted(
+            [
+                "night_00_05",
+                "morning_06_11",
+                "afternoon_12_17",
+                "evening_18_23",
+            ]
+        )
 
-        assert time_bucket_codes == expected_codes, \
+        assert time_bucket_codes == expected_codes, (
             f"time_bucket codes should be {expected_codes}, got gaps or extras"
+        )
 
     def test_time_bucket_options_have_labels(self):
         """
@@ -88,10 +96,12 @@ class TestUS06TimeBucketDropdown:
         """
         for opt in self.ref_data["time_bucket"]:
             assert "label" in opt, f"Option {opt['code']} should have 'label' key"
-            assert isinstance(opt["label"], str), \
+            assert isinstance(opt["label"], str), (
                 f"Option {opt['code']} label should be string"
-            assert len(opt["label"]) > 0, \
+            )
+            assert len(opt["label"]) > 0, (
                 f"Option {opt['code']} label should not be empty"
+            )
 
     def test_time_bucket_formatted_options_are_parseable(self):
         """
@@ -101,14 +111,22 @@ class TestUS06TimeBucketDropdown:
         When: Parsing each option
         Then: All produce valid string codes
         """
-        formatted_options = reference_loader.get_dropdown_options(self.ref_data, "time_bucket")
+        formatted_options = reference_loader.get_dropdown_options(
+            self.ref_data, "time_bucket"
+        )
         assert len(formatted_options) == 4
 
         for option in formatted_options:
             code = reference_loader.parse_dropdown_value(option)
-            assert isinstance(code, str), f"Parsed code from '{option}' should be string"
-            assert code in ["night_00_05", "morning_06_11", "afternoon_12_17", "evening_18_23"], \
-                f"Code {code} from '{option}' should be in expected time buckets"
+            assert isinstance(code, str), (
+                f"Parsed code from '{option}' should be string"
+            )
+            assert code in [
+                "night_00_05",
+                "morning_06_11",
+                "afternoon_12_17",
+                "evening_18_23",
+            ], f"Code {code} from '{option}' should be in expected time buckets"
 
     def test_time_bucket_selectbox_prevents_invalid_input(self):
         """
@@ -118,8 +136,13 @@ class TestUS06TimeBucketDropdown:
         When: Checking all codes
         Then: No values outside expected set exist
         """
-        valid_codes = {"night_00_05", "morning_06_11", "afternoon_12_17", "evening_18_23"}
-        actual_codes = set(opt["code"] for opt in self.ref_data["time_bucket"])
+        valid_codes = {
+            "night_00_05",
+            "morning_06_11",
+            "afternoon_12_17",
+            "evening_18_23",
+        }
+        actual_codes = {opt["code"] for opt in self.ref_data["time_bucket"]}
 
         # No invalid codes
         invalid = actual_codes - valid_codes

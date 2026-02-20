@@ -8,6 +8,7 @@ Tests verify that:
 """
 
 import pytest
+
 from briefml.ui.lib import reference_loader
 
 
@@ -180,7 +181,7 @@ class TestUS03DropdownFormat:
                 {"code": 2, "label": "Crépuscule ou aube"},
                 {"code": 3, "label": "Nuit sans éclairage public"},
                 {"code": 4, "label": "Nuit avec éclairage public non allumé"},
-                {"code": 5, "label": "Nuit avec éclairage public allumé"}
+                {"code": 5, "label": "Nuit avec éclairage public allumé"},
             ]
         }
 
@@ -226,7 +227,7 @@ class TestUS03DropdownFormat:
         ref_data = {
             "lum": [
                 {"code": 1, "label": "Plein jour"},
-                {"code": 2, "label": "Crépuscule ou aube"}
+                {"code": 2, "label": "Crépuscule ou aube"},
             ]
         }
 
@@ -245,9 +246,7 @@ class TestUS03DropdownFormat:
         Then: Raises ValueError
         """
         # Arrange
-        ref_data = {
-            "lum": [{"code": 1, "label": "Plein jour"}]
-        }
+        ref_data = {"lum": [{"code": 1, "label": "Plein jour"}]}
 
         # Act & Assert
         with pytest.raises(ValueError) as exc_info:

@@ -7,8 +7,8 @@ Tests verify that:
 3. Probability <0.47 → class "non_grave"
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from briefml.ui.lib import api_client
 
 
@@ -39,7 +39,7 @@ class TestUS07Prediction:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Mock successful API response
@@ -48,11 +48,11 @@ class TestUS07Prediction:
         mock_response.json.return_value = {
             "probability": 0.68,
             "prediction": "grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
 
         # Act
-        with patch('requests.post', return_value=mock_response):
+        with patch("requests.post", return_value=mock_response):
             result = api_client.call_predict_api(valid_inputs)
 
         # Assert
@@ -62,7 +62,9 @@ class TestUS07Prediction:
         assert result["probability"] == 0.68
         assert result["prediction"] == "grave"
         assert result["threshold"] == 0.47
-        assert api_client.is_success_response(result), "Should be recognized as success response"
+        assert api_client.is_success_response(result), (
+            "Should be recognized as success response"
+        )
 
     def test_probability_above_threshold_returns_grave_class(self):
         """
@@ -88,7 +90,7 @@ class TestUS07Prediction:
             "catv_family_4": 2,
             "lum": 3,
             "atm": 7,
-            "time_bucket": "evening_18_23"
+            "time_bucket": "evening_18_23",
         }
 
         # Mock API response with high probability
@@ -97,16 +99,18 @@ class TestUS07Prediction:
         mock_response.json.return_value = {
             "probability": 0.68,
             "prediction": "grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
 
         # Act
-        with patch('requests.post', return_value=mock_response):
+        with patch("requests.post", return_value=mock_response):
             result = api_client.call_predict_api(inputs)
 
         # Assert
         assert result["probability"] >= 0.47, "Probability should be above threshold"
-        assert result["prediction"] == "grave", "Classification should be 'grave' for high probability"
+        assert result["prediction"] == "grave", (
+            "Classification should be 'grave' for high probability"
+        )
 
     def test_probability_below_threshold_returns_non_grave_class(self):
         """
@@ -132,7 +136,7 @@ class TestUS07Prediction:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Mock API response with low probability
@@ -141,16 +145,18 @@ class TestUS07Prediction:
         mock_response.json.return_value = {
             "probability": 0.23,
             "prediction": "non_grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
 
         # Act
-        with patch('requests.post', return_value=mock_response):
+        with patch("requests.post", return_value=mock_response):
             result = api_client.call_predict_api(inputs)
 
         # Assert
         assert result["probability"] < 0.47, "Probability should be below threshold"
-        assert result["prediction"] == "non_grave", "Classification should be 'non_grave' for low probability"
+        assert result["prediction"] == "non_grave", (
+            "Classification should be 'non_grave' for low probability"
+        )
 
     def test_threshold_boundary_case_exactly_0_47(self):
         """
@@ -176,7 +182,7 @@ class TestUS07Prediction:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Mock API response with probability exactly at threshold
@@ -185,16 +191,20 @@ class TestUS07Prediction:
         mock_response.json.return_value = {
             "probability": 0.47,
             "prediction": "grave",
-            "threshold": 0.47
+            "threshold": 0.47,
         }
 
         # Act
-        with patch('requests.post', return_value=mock_response):
+        with patch("requests.post", return_value=mock_response):
             result = api_client.call_predict_api(inputs)
 
         # Assert
-        assert result["probability"] == 0.47, "Probability should be exactly at threshold"
-        assert result["prediction"] == "grave", "Classification should be 'grave' at threshold (inclusive)"
+        assert result["probability"] == 0.47, (
+            "Probability should be exactly at threshold"
+        )
+        assert result["prediction"] == "grave", (
+            "Classification should be 'grave' at threshold (inclusive)"
+        )
 
     def test_error_response_does_not_contain_probability(self):
         """
@@ -211,16 +221,18 @@ class TestUS07Prediction:
         mock_response = MagicMock()
         mock_response.status_code = 422
         mock_response.json.return_value = {
-            "detail": [
-                {"loc": ["body", "lum"], "msg": "field required"}
-            ]
+            "detail": [{"loc": ["body", "lum"], "msg": "field required"}]
         }
 
         # Act
-        with patch('requests.post', return_value=mock_response):
+        with patch("requests.post", return_value=mock_response):
             result = api_client.call_predict_api(invalid_inputs)
 
         # Assert
         assert "error" in result, "Error response should contain 'error' field"
-        assert "probability" not in result, "Error response should not contain 'probability'"
-        assert not api_client.is_success_response(result), "Should be recognized as error response"
+        assert "probability" not in result, (
+            "Error response should not contain 'probability'"
+        )
+        assert not api_client.is_success_response(result), (
+            "Should be recognized as error response"
+        )

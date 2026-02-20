@@ -10,9 +10,11 @@ This module provides helper functions to:
 """
 
 from typing import Any
-import streamlit as st
+
 import pandas as pd
-from briefml.ui.lib import validation, reference_loader
+import streamlit as st
+
+from briefml.ui.lib import reference_loader, validation
 
 
 def initialize_state(reference_data: dict[str, list[dict[str, Any]]]) -> None:
@@ -24,22 +26,22 @@ def initialize_state(reference_data: dict[str, list[dict[str, Any]]]) -> None:
     Args:
         reference_data: Loaded reference data from reference_loader
     """
-    if 'current_page' not in st.session_state:
+    if "current_page" not in st.session_state:
         st.session_state.current_page = 1
 
-    if 'prediction_inputs' not in st.session_state:
+    if "prediction_inputs" not in st.session_state:
         st.session_state.prediction_inputs = {}
 
-    if 'last_prediction' not in st.session_state:
+    if "last_prediction" not in st.session_state:
         st.session_state.last_prediction = None
 
-    if 'validation_errors' not in st.session_state:
+    if "validation_errors" not in st.session_state:
         st.session_state.validation_errors = {}
 
-    if 'reference_data' not in st.session_state:
+    if "reference_data" not in st.session_state:
         st.session_state.reference_data = reference_data
 
-    if 'is_form_complete' not in st.session_state:
+    if "is_form_complete" not in st.session_state:
         st.session_state.is_form_complete = False
 
 
@@ -50,7 +52,7 @@ def get_current_page() -> int:
     Returns:
         Current page (1-6)
     """
-    return st.session_state.get('current_page', 1)
+    return st.session_state.get("current_page", 1)
 
 
 def set_current_page(page: int) -> None:
@@ -212,15 +214,26 @@ def update_form_complete_status() -> None:
     Checks if all 15 required fields are filled.
     """
     required_fields = [
-        "dep", "lum", "atm", "catr", "agg", "int", "circ",
-        "col", "vma_bucket", "catv_family_4", "manv_mode",
-        "driver_age_bucket", "choc_mode", "driver_trajet_family", "time_bucket"
+        "dep",
+        "lum",
+        "atm",
+        "catr",
+        "agg",
+        "int",
+        "circ",
+        "col",
+        "vma_bucket",
+        "catv_family_4",
+        "manv_mode",
+        "driver_age_bucket",
+        "choc_mode",
+        "driver_trajet_family",
+        "time_bucket",
     ]
 
     inputs = st.session_state.prediction_inputs
     st.session_state.is_form_complete = all(
-        field in inputs and inputs[field] is not None
-        for field in required_fields
+        field in inputs and inputs[field] is not None for field in required_fields
     )
 
 
@@ -231,10 +244,12 @@ def is_form_complete() -> bool:
     Returns:
         True if all fields are filled, False otherwise
     """
-    return st.session_state.get('is_form_complete', False)
+    return st.session_state.get("is_form_complete", False)
 
 
-def generate_recap_table(prediction_inputs: dict[str, Any], reference_data: dict[str, list[dict[str, Any]]]) -> pd.DataFrame:
+def generate_recap_table(
+    prediction_inputs: dict[str, Any], reference_data: dict[str, list[dict[str, Any]]]
+) -> pd.DataFrame:
     """
     Generate recap table showing all filled prediction inputs.
 
@@ -259,16 +274,20 @@ def generate_recap_table(prediction_inputs: dict[str, Any], reference_data: dict
         page_number = validation.get_field_page(field_name)
 
         try:
-            value_label = reference_loader.get_label_for_code(reference_data, field_name, field_value)
+            value_label = reference_loader.get_label_for_code(
+                reference_data, field_name, field_value
+            )
         except (KeyError, ValueError):
             value_label = str(field_value)
 
-        rows.append({
-            "Champ": field_label,
-            "Code": str(field_value),
-            "Libellé": value_label,
-            "Page": page_number
-        })
+        rows.append(
+            {
+                "Champ": field_label,
+                "Code": str(field_value),
+                "Libellé": value_label,
+                "Page": page_number,
+            }
+        )
 
     df = pd.DataFrame(rows)
 

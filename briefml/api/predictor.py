@@ -1,5 +1,6 @@
 """
-predictor.py — API FastAPI pour prédire la gravité d'un accident (CatBoost product15_v2_time_bucket)
+predictor.py — API FastAPI pour prédire la gravité d'un accident
+(CatBoost product15_v2_time_bucket)
 
 - Charge un modèle CatBoost (.cbm) et un meta.json (features, cat_features, threshold)
 - Valide / normalise les 15 champs utilisateur
@@ -20,14 +21,13 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-
 
 # -----------------------------
 # Config / Meta
@@ -36,8 +36,12 @@ from pydantic import BaseModel, Field
 # Remonte de briefml/api/ → briefml/ → racine du projet
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-DEFAULT_MODEL_PATH = str(BASE_DIR / "model" / "catboost_product15_v2_time_bucket_final.cbm")
-DEFAULT_META_PATH = str(BASE_DIR / "artifacts" / "catboost_product15_v2_time_bucket_final_meta.json")
+DEFAULT_MODEL_PATH = str(
+    BASE_DIR / "model" / "catboost_product15_v2_time_bucket_final.cbm"
+)
+DEFAULT_META_PATH = str(
+    BASE_DIR / "artifacts" / "catboost_product15_v2_time_bucket_final_meta.json"
+)
 MISSING_CAT = os.getenv("MISSING_CAT", "__MISSING__")
 
 
@@ -45,11 +49,11 @@ MISSING_CAT = os.getenv("MISSING_CAT", "__MISSING__")
 class ModelMeta:
     model_name: str
     threshold: float
-    features: List[str]
-    cat_features: List[str]
+    features: list[str]
+    cat_features: list[str]
 
     @staticmethod
-    def load(meta_path: str | Path) -> "ModelMeta":
+    def load(meta_path: str | Path) -> ModelMeta:
         p = Path(meta_path)
         if not p.exists():
             raise FileNotFoundError(f"Meta JSON introuvable: {p}")
@@ -61,14 +65,16 @@ class ModelMeta:
                 raise ValueError(f"Champ manquant dans meta.json: {k}")
 
         return ModelMeta(
-            model_name=str(obj.get("model_name", "catboost_product15_v2_time_bucket_final")),
+            model_name=str(
+                obj.get("model_name", "catboost_product15_v2_time_bucket_final")
+            ),
             threshold=float(obj["threshold"]),
             features=list(obj["features"]),
             cat_features=list(obj["cat_features"]),
         )
 
 
-def load_model_and_meta() -> Tuple[CatBoostClassifier, ModelMeta]:
+def load_model_and_meta() -> tuple[CatBoostClassifier, ModelMeta]:
     model_path = Path(os.getenv("MODEL_PATH", DEFAULT_MODEL_PATH))
     meta_path = Path(os.getenv("META_PATH", DEFAULT_META_PATH))
 
@@ -87,13 +93,13 @@ def load_model_and_meta() -> Tuple[CatBoostClassifier, ModelMeta]:
 # -----------------------------
 
 # Defaults facultatifs: complète si tu veux autoriser des champs omis.
-DEFAULTS: Dict[str, Any] = {}
+DEFAULTS: dict[str, Any] = {}
 
 # Champs à forcer en numérique
 NUMERIC_FIELDS: set[str] = set()
 
 
-def normalize_input(payload: Dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
+def normalize_input(payload: dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
     missing = [c for c in meta.features if c not in payload]
     if missing:
         can_fill = [c for c in missing if c in DEFAULTS]
@@ -104,7 +110,10 @@ def normalize_input(payload: Dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
                 detail={
                     "error": "Champs manquants",
                     "missing_fields": still_missing,
-                    "hint": "Fournis tous les 15 champs, ou définis des DEFAULTS côté API si tu veux autoriser des omissions.",
+                    "hint": (
+                        "Fournis tous les 15 champs, ou définis des DEFAULTS"
+                        " côté API si tu veux autoriser des omissions."
+                    ),
                 },
             )
         for c in can_fill:
@@ -131,12 +140,12 @@ def normalize_input(payload: Dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
                         "error": "Format invalide",
                         "field": c,
                         "value": v,
-                        "hint": "Le champ doit être un nombre (format HH:MM non accepté).",
+                        "hint": "Le champ doit être un nombre (HH:MM non accepté).",
                     },
                 )
             try:
                 X[c] = pd.to_numeric(X[c], errors="raise").astype(float)
-            except Exception:
+            except Exception as err:
                 raise HTTPException(
                     status_code=422,
                     detail={
@@ -145,7 +154,7 @@ def normalize_input(payload: Dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
                         "value": payload.get(c),
                         "hint": "Le champ doit être numérique.",
                     },
-                )
+                ) from err
 
     return X
 
@@ -156,8 +165,8 @@ def normalize_input(payload: Dict[str, Any], meta: ModelMeta) -> pd.DataFrame:
 
 app = FastAPI(title="Accidents — CatBoost product15_v2_time_bucket", version="1.0.0")
 
-MODEL: Optional[CatBoostClassifier] = None
-META: Optional[ModelMeta] = None
+MODEL: CatBoostClassifier | None = None
+META: ModelMeta | None = None
 
 
 @app.on_event("startup")
@@ -167,7 +176,7 @@ def _startup() -> None:
 
 
 @app.get("/health")
-def health() -> Dict[str, Any]:
+def health() -> dict[str, Any]:
     if MODEL is None or META is None:
         return {"status": "loading"}
     return {
@@ -179,7 +188,9 @@ def health() -> Dict[str, Any]:
 
 
 class PredictRequest(BaseModel):
-    data: Dict[str, Any] = Field(..., description="Dictionnaire des 15 champs utilisateur")
+    data: dict[str, Any] = Field(
+        ..., description="Dictionnaire des 15 champs utilisateur"
+    )
 
 
 class PredictResponse(BaseModel):
@@ -192,7 +203,9 @@ class PredictResponse(BaseModel):
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest) -> PredictResponse:
     if MODEL is None or META is None:
-        raise HTTPException(status_code=503, detail="Modèle non prêt (startup en cours).")
+        raise HTTPException(
+            status_code=503, detail="Modèle non prêt (startup en cours)."
+        )
 
     X = normalize_input(dict(req.data), META)
 
@@ -201,4 +214,6 @@ def predict(req: PredictRequest) -> PredictResponse:
     pred_class = int(proba >= threshold)
     label = "grave" if pred_class == 1 else "non_grave"
 
-    return PredictResponse(proba=proba, pred_class=pred_class, label=label, threshold=threshold)
+    return PredictResponse(
+        proba=proba, pred_class=pred_class, label=label, threshold=threshold
+    )

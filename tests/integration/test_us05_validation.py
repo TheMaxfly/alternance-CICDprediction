@@ -8,8 +8,8 @@ Tests verify that:
 """
 
 import pytest
-from briefml.ui.lib import session_state, validation
 
+from briefml.ui.lib import validation
 
 pytestmark = pytest.mark.integration
 
@@ -36,7 +36,7 @@ class TestUS05ValidationIntegration:
             "col": 2,
             "choc_mode": 1,
             "manv_mode": 1,
-            "driver_age_bucket": 30
+            "driver_age_bucket": 30,
             # Missing: driver_trajet_family, catv_family_4, lum, atm, time_bucket
         }
 
@@ -77,7 +77,7 @@ class TestUS05ValidationIntegration:
             "catv_family_4": 1,
             "lum": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Act
@@ -107,7 +107,7 @@ class TestUS05ValidationIntegration:
             "driver_age_bucket": 30,
             "driver_trajet_family": 1,
             "catv_family_4": 1,
-            "atm": 1
+            "atm": 1,
             # Missing: dep (page 1), col + manv_mode (page 3), lum + time_bucket (page 5)
         }
 
@@ -153,11 +153,20 @@ class TestUS05ValidationIntegration:
 
         # Stage 4: ~93% (14/15 fields)
         stage_4 = {
-            "dep": "59", "agg": 1, "catr": 1, "vma_bucket": 50,
-            "int": 1, "circ": 1, "col": 2, "choc_mode": 1,
-            "manv_mode": 1, "driver_age_bucket": 30,
-            "driver_trajet_family": 1, "catv_family_4": 1,
-            "lum": 1, "atm": 1
+            "dep": "59",
+            "agg": 1,
+            "catr": 1,
+            "vma_bucket": 50,
+            "int": 1,
+            "circ": 1,
+            "col": 2,
+            "choc_mode": 1,
+            "manv_mode": 1,
+            "driver_age_bucket": 30,
+            "driver_trajet_family": 1,
+            "catv_family_4": 1,
+            "lum": 1,
+            "atm": 1,
             # Missing only time_bucket
         }
         percentage_4 = validation.get_completion_percentage(stage_4)
@@ -190,7 +199,7 @@ class TestUS05ValidationIntegration:
             "driver_trajet_family": 1,
             "catv_family_4": 1,
             "atm": 1,
-            "time_bucket": "morning_06_11"
+            "time_bucket": "morning_06_11",
         }
 
         # Act
@@ -211,7 +220,7 @@ class TestUS05ValidationIntegration:
         Then: Form is not complete (None values don't count)
         """
         # Arrange: All fields present but None
-        all_none = {field: None for field in validation.REQUIRED_FIELDS}
+        all_none = dict.fromkeys(validation.REQUIRED_FIELDS)
 
         # Act
         is_complete = validation.is_form_complete(all_none)
@@ -236,7 +245,7 @@ class TestUS05ValidationIntegration:
             "catr": 1,
             "vma_bucket": 50,
             "int": 1,
-            "circ": 1
+            "circ": 1,
             # All of pages 3, 4, 5 are missing
         }
 
@@ -251,4 +260,6 @@ class TestUS05ValidationIntegration:
         assert 5 in missing_pages, "Should identify missing fields on page 5"
 
         # Should not mention pages 1-2 (already complete)
-        assert all(page > 2 for page in missing_pages), "Should only mention incomplete pages"
+        assert all(page > 2 for page in missing_pages), (
+            "Should only mention incomplete pages"
+        )

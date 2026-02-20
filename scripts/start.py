@@ -5,11 +5,11 @@ Usage:
     uv run python scripts/start.py
 """
 
+import os
+import signal
 import subprocess
 import sys
-import signal
 import time
-import os
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,7 +19,16 @@ def main():
 
     # 1. Lancer l'API FastAPI
     api_proc = subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "briefml.api.predictor:app", "--host", "0.0.0.0", "--port", "8000"],
+        [
+            sys.executable,
+            "-m",
+            "uvicorn",
+            "briefml.api.predictor:app",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8000",
+        ],
         cwd=PROJECT_DIR,
     )
     procs.append(api_proc)
@@ -27,7 +36,15 @@ def main():
 
     # 2. Lancer Streamlit
     st_proc = subprocess.Popen(
-        [sys.executable, "-m", "streamlit", "run", "briefml/ui/app.py", "--server.port", "8501"],
+        [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            "briefml/ui/app.py",
+            "--server.port",
+            "8501",
+        ],
         cwd=PROJECT_DIR,
     )
     procs.append(st_proc)

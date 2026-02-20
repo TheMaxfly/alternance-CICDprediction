@@ -9,12 +9,23 @@ This module provides functions to:
 
 from typing import Any
 
-
 # Required fields for prediction
 REQUIRED_FIELDS = [
-    "dep", "lum", "atm", "catr", "agg", "int", "circ",
-    "col", "vma_bucket", "catv_family_4", "manv_mode",
-    "driver_age_bucket", "choc_mode", "driver_trajet_family", "time_bucket"
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket",
 ]
 
 # Field to page mapping (for navigation hints)
@@ -33,7 +44,7 @@ FIELD_TO_PAGE = {
     "catv_family_4": 4,
     "lum": 5,
     "atm": 5,
-    "time_bucket": 5
+    "time_bucket": 5,
 }
 
 # Field labels in French (for error messages)
@@ -52,7 +63,7 @@ FIELD_LABELS = {
     "driver_age_bucket": "Classe d'âge conducteur",
     "choc_mode": "Point de choc initial",
     "driver_trajet_family": "Famille de trajet conducteur",
-    "time_bucket": "Tranche horaire"
+    "time_bucket": "Tranche horaire",
 }
 
 
@@ -89,7 +100,9 @@ def get_missing_fields(prediction_inputs: dict[str, Any]) -> list[str]:
     return missing
 
 
-def get_missing_fields_with_pages(prediction_inputs: dict[str, Any]) -> list[tuple[int, str, str]]:
+def get_missing_fields_with_pages(
+    prediction_inputs: dict[str, Any],
+) -> list[tuple[int, str, str]]:
     """
     Get list of missing fields with their page numbers and labels.
 
@@ -127,13 +140,15 @@ def format_missing_fields_message(prediction_inputs: dict[str, Any]) -> str:
         return ""
 
     lines = ["Champs manquants:"]
-    for page, field_name, field_label in missing:
+    for page, _field_name, field_label in missing:
         lines.append(f"- Page {page}: {field_label}")
 
     return "\n".join(lines)
 
 
-def validate_field(field_name: str, value: Any, reference_data: dict[str, list[dict[str, Any]]]) -> tuple[bool, str]:
+def validate_field(
+    field_name: str, value: Any, reference_data: dict[str, list[dict[str, Any]]]
+) -> tuple[bool, str]:
     """
     Validate a single field value against reference data.
 
@@ -157,7 +172,7 @@ def validate_field(field_name: str, value: Any, reference_data: dict[str, list[d
 
     # Get valid codes from reference data
     valid_options = reference_data[field_name]
-    valid_codes = [opt['code'] for opt in valid_options]
+    valid_codes = [opt["code"] for opt in valid_options]
 
     # Check if value is in valid codes
     if value not in valid_codes:
@@ -177,7 +192,8 @@ def get_completion_percentage(prediction_inputs: dict[str, Any]) -> float:
         Percentage of fields filled (0.0 to 100.0)
     """
     filled_count = sum(
-        1 for field in REQUIRED_FIELDS
+        1
+        for field in REQUIRED_FIELDS
         if field in prediction_inputs and prediction_inputs[field] is not None
     )
     return (filled_count / len(REQUIRED_FIELDS)) * 100

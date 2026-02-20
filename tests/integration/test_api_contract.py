@@ -11,10 +11,10 @@ Test scenarios:
 """
 
 import os
+
 import pytest
 import requests
 from requests.exceptions import RequestException
-
 
 # API configuration - can be overridden with environment variable
 API_URL = os.getenv("API_URL", "http://localhost:8000")
@@ -40,7 +40,7 @@ def valid_payload():
         "driver_age_bucket": "25-34",
         "choc_mode": 1,
         "driver_trajet_family": "trajet_1",
-        "time_bucket": "morning_06_11"
+        "time_bucket": "morning_06_11",
     }
 
 
@@ -51,11 +51,13 @@ def test_api_reachable():
     This test should be run first to verify the API is accessible.
     """
     try:
-        response = requests.get(f"{API_URL}/", timeout=5)
+        requests.get(f"{API_URL}/", timeout=5)
         # Any response (even 404) means the server is reachable
         assert True, "API is reachable"
     except RequestException:
-        pytest.skip(f"API not reachable at {API_URL}. Start the API server before running tests.")
+        pytest.skip(
+            f"API not reachable at {API_URL}. Start the API server before running tests."
+        )
 
 
 def test_predict_endpoint_success(valid_payload):
@@ -88,24 +90,32 @@ def test_predict_endpoint_success(valid_payload):
     assert "threshold" in result, "Response missing 'threshold' field"
 
     # Validate probability
-    assert isinstance(result["probability"], (int, float)), "probability must be numeric"
-    assert 0.0 <= result["probability"] <= 1.0, "probability must be between 0.0 and 1.0"
+    assert isinstance(result["probability"], (int, float)), (
+        "probability must be numeric"
+    )
+    assert 0.0 <= result["probability"] <= 1.0, (
+        "probability must be between 0.0 and 1.0"
+    )
 
     # Validate prediction
-    assert result["prediction"] in ["grave", "non_grave"], \
+    assert result["prediction"] in ["grave", "non_grave"], (
         f"prediction must be 'grave' or 'non_grave', got '{result['prediction']}'"
+    )
 
     # Validate threshold
-    assert result["threshold"] == 0.47, \
+    assert result["threshold"] == 0.47, (
         f"threshold must be 0.47, got {result['threshold']}"
+    )
 
     # Validate prediction consistency with threshold
     if result["probability"] >= 0.47:
-        assert result["prediction"] == "grave", \
+        assert result["prediction"] == "grave", (
             f"probability {result['probability']} >= 0.47 should predict 'grave'"
+        )
     else:
-        assert result["prediction"] == "non_grave", \
+        assert result["prediction"] == "non_grave", (
             f"probability {result['probability']} < 0.47 should predict 'non_grave'"
+        )
 
 
 def test_predict_endpoint_validation_error_invalid_lum(valid_payload):
@@ -135,8 +145,9 @@ def test_predict_endpoint_validation_error_invalid_lum(valid_payload):
     response = requests.post(PREDICT_ENDPOINT, json=invalid_payload, timeout=10)
 
     # Assert status code
-    assert response.status_code == 422, \
+    assert response.status_code == 422, (
         f"Expected 422 for invalid input, got {response.status_code}"
+    )
 
     # Parse error response
     error = response.json()
@@ -186,15 +197,16 @@ def test_predict_endpoint_missing_required_field():
         "driver_age_bucket": "25-34",
         "choc_mode": 1,
         "driver_trajet_family": "trajet_1",
-        "time_bucket": "morning_06_11"
+        "time_bucket": "morning_06_11",
     }
 
     # Make request
     response = requests.post(PREDICT_ENDPOINT, json=incomplete_payload, timeout=10)
 
     # Assert status code
-    assert response.status_code == 422, \
+    assert response.status_code == 422, (
         f"Expected 422 for missing field, got {response.status_code}"
+    )
 
     # Parse error response
     error = response.json()
@@ -232,15 +244,16 @@ def test_predict_endpoint_all_fields_invalid():
         "driver_age_bucket": "invalid",  # Not in valid buckets
         "choc_mode": 20,  # Out of range -1 to 9
         "driver_trajet_family": "invalid",  # Not in valid families
-        "time_bucket": "invalid"  # Not in valid time buckets
+        "time_bucket": "invalid",  # Not in valid time buckets
     }
 
     # Make request
     response = requests.post(PREDICT_ENDPOINT, json=invalid_payload, timeout=10)
 
     # Assert status code
-    assert response.status_code == 422, \
+    assert response.status_code == 422, (
         f"Expected 422 for multiple invalid fields, got {response.status_code}"
+    )
 
     # Parse error response
     error = response.json()
@@ -250,8 +263,9 @@ def test_predict_endpoint_all_fields_invalid():
     assert isinstance(error["detail"], list), "'detail' must be a list"
 
     # Expect multiple errors (at least 5 of the 15 fields should be flagged)
-    assert len(error["detail"]) >= 5, \
+    assert len(error["detail"]) >= 5, (
         f"Expected multiple validation errors, got {len(error['detail'])}"
+    )
 
 
 # Pytest markers

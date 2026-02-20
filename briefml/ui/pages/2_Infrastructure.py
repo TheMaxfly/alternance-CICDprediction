@@ -5,7 +5,8 @@ Fields: int, circ
 """
 
 import streamlit as st
-from briefml.ui.lib import session_state, reference_loader
+
+from briefml.ui.lib import reference_loader, session_state
 
 
 def render():
@@ -24,12 +25,16 @@ def render():
 
     int_index = 0
     if current_int:
-        formatted_current = reference_loader.format_dropdown_option(current_int,
-            reference_loader.get_label_for_code(ref_data, "int", current_int))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_int,
+            reference_loader.get_label_for_code(ref_data, "int", current_int),
+        )
         if formatted_current in int_options:
             int_index = int_options.index(formatted_current)
 
-    int_selected = st.selectbox("Type d'intersection", options=int_options, index=int_index, key="int_input")
+    int_selected = st.selectbox(
+        "Type d'intersection", options=int_options, index=int_index, key="int_input"
+    )
     if int_selected:
         int_code = reference_loader.parse_dropdown_value(int_selected)
         session_state.set_prediction_input("int", int_code)
@@ -48,12 +53,19 @@ def render():
 
     circ_index = 0
     if current_circ:
-        formatted_current = reference_loader.format_dropdown_option(current_circ,
-            reference_loader.get_label_for_code(ref_data, "circ", current_circ))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_circ,
+            reference_loader.get_label_for_code(ref_data, "circ", current_circ),
+        )
         if formatted_current in circ_options:
             circ_index = circ_options.index(formatted_current)
 
-    circ_selected = st.selectbox("Regime de circulation", options=circ_options, index=circ_index, key="circ_input")
+    circ_selected = st.selectbox(
+        "Regime de circulation",
+        options=circ_options,
+        index=circ_index,
+        key="circ_input",
+    )
     if circ_selected:
         circ_code = reference_loader.parse_dropdown_value(circ_selected)
         session_state.set_prediction_input("circ", circ_code)
@@ -82,8 +94,10 @@ def render():
 
 # Standalone execution
 if __name__ == "__main__":
-    st.set_page_config(page_title="Page 2 - Infrastructure", page_icon="🚦", layout="centered")
-    if 'reference_data' not in st.session_state:
+    st.set_page_config(
+        page_title="Page 2 - Infrastructure", page_icon="🚦", layout="centered"
+    )
+    if "reference_data" not in st.session_state:
         reference_data = reference_loader.load_reference_data()
         session_state.initialize_state(reference_data)
     render()

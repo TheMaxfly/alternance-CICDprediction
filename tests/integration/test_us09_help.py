@@ -5,7 +5,8 @@ Tests that each page's fields have help text available via get_field_help().
 """
 
 import pytest
-from briefml.ui.lib.reference_loader import load_reference_data, get_field_help
+
+from briefml.ui.lib.reference_loader import get_field_help, load_reference_data
 
 pytestmark = pytest.mark.integration
 
@@ -59,8 +60,9 @@ class TestUS09HelpIntegration:
         for field in ref_data:
             help_info = get_field_help(ref_data, field)
             if help_info is not None:
-                assert len(help_info["codes"]) == len(ref_data[field]), \
+                assert len(help_info["codes"]) == len(ref_data[field]), (
                     f"Field '{field}': help has {len(help_info['codes'])} codes but ref has {len(ref_data[field])}"
+                )
 
     def test_help_definition_is_in_french(self, ref_data):
         """Help definitions should be written in French."""
@@ -68,5 +70,9 @@ class TestUS09HelpIntegration:
         help_lum = get_field_help(ref_data, "lum")
         # Should contain French words
         definition = help_lum["definition"].lower()
-        assert any(word in definition for word in ["éclairage", "luminosité", "lumière", "conditions"]), \
+        assert any(
+            word in definition
+            for word in ["éclairage", "luminosité", "lumière", "conditions"]
+        ), (
             f"Definition for 'lum' doesn't appear to be in French: {help_lum['definition']}"
+        )

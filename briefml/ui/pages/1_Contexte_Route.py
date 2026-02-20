@@ -5,7 +5,8 @@ Fields: dep, agg, catr, vma_bucket
 """
 
 import streamlit as st
-from briefml.ui.lib import session_state, reference_loader
+
+from briefml.ui.lib import reference_loader, session_state
 
 
 def render():
@@ -28,16 +29,15 @@ def render():
     # Find index for current value
     dep_index = 0
     if current_dep:
-        formatted_current = reference_loader.format_dropdown_option(current_dep,
-            reference_loader.get_label_for_code(ref_data, "dep", current_dep))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_dep,
+            reference_loader.get_label_for_code(ref_data, "dep", current_dep),
+        )
         if formatted_current in dep_options:
             dep_index = dep_options.index(formatted_current)
 
     dep_selected = st.selectbox(
-        "Departement",
-        options=dep_options,
-        index=dep_index,
-        key="dep_input"
+        "Departement", options=dep_options, index=dep_index, key="dep_input"
     )
     if dep_selected:
         dep_code = reference_loader.parse_dropdown_value(dep_selected)
@@ -58,8 +58,10 @@ def render():
 
     agg_index = 0
     if current_agg:
-        formatted_current = reference_loader.format_dropdown_option(current_agg,
-            reference_loader.get_label_for_code(ref_data, "agg", current_agg))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_agg,
+            reference_loader.get_label_for_code(ref_data, "agg", current_agg),
+        )
         if formatted_current in agg_options:
             agg_index = agg_options.index(formatted_current)
 
@@ -68,7 +70,7 @@ def render():
         options=agg_options,
         index=agg_index,
         key="agg_input",
-        help="Accident en ou hors agglomeration"
+        help="Accident en ou hors agglomeration",
     )
     if agg_selected:
         agg_code = reference_loader.parse_dropdown_value(agg_selected)
@@ -88,16 +90,15 @@ def render():
 
     catr_index = 0
     if current_catr:
-        formatted_current = reference_loader.format_dropdown_option(current_catr,
-            reference_loader.get_label_for_code(ref_data, "catr", current_catr))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_catr,
+            reference_loader.get_label_for_code(ref_data, "catr", current_catr),
+        )
         if formatted_current in catr_options:
             catr_index = catr_options.index(formatted_current)
 
     catr_selected = st.selectbox(
-        "Categorie de route",
-        options=catr_options,
-        index=catr_index,
-        key="catr_input"
+        "Categorie de route", options=catr_options, index=catr_index, key="catr_input"
     )
     if catr_selected:
         catr_code = reference_loader.parse_dropdown_value(catr_selected)
@@ -117,8 +118,10 @@ def render():
 
     vma_index = 0
     if current_vma:
-        formatted_current = reference_loader.format_dropdown_option(current_vma,
-            reference_loader.get_label_for_code(ref_data, "vma_bucket", current_vma))
+        formatted_current = reference_loader.format_dropdown_option(
+            current_vma,
+            reference_loader.get_label_for_code(ref_data, "vma_bucket", current_vma),
+        )
         if formatted_current in vma_options:
             vma_index = vma_options.index(formatted_current)
 
@@ -126,7 +129,7 @@ def render():
         "Vitesse maximale autorisee",
         options=vma_options,
         index=vma_index,
-        key="vma_input"
+        key="vma_input",
     )
     if vma_selected:
         vma_code = reference_loader.parse_dropdown_value(vma_selected)
@@ -156,8 +159,10 @@ def render():
 
 # Standalone execution
 if __name__ == "__main__":
-    st.set_page_config(page_title="Page 1 - Contexte Route", page_icon="🛣️", layout="centered")
-    if 'reference_data' not in st.session_state:
+    st.set_page_config(
+        page_title="Page 1 - Contexte Route", page_icon="🛣️", layout="centered"
+    )
+    if "reference_data" not in st.session_state:
         reference_data = reference_loader.load_reference_data()
         session_state.initialize_state(reference_data)
     render()
