@@ -47,6 +47,8 @@ plugins:
 nav:
   - Accueil: index.md
   - Démarrage: getting-started.md
+  - MLOps:
+      - MLflow: mlflow.md
   - API:
       - Prédicteur: api/predictor.md
   - Référence:

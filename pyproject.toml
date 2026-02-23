@@ -12,6 +12,7 @@ dependencies = [
     "jupyter>=1.1.1",
     "lightgbm>=4.6.0",
     "matplotlib>=3.10.8",
+    "mlflow>=3.10.0",
     "numpy>=2.4.1",
     "optuna>=4.7.0",
     "pandas>=1.4.0",

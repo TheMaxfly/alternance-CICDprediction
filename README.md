@@ -70,6 +70,11 @@ docker build -f docker/Dockerfile --target api -t briefml-api .
 docker build -f docker/Dockerfile --target streamlit -t briefml-ui .
 ```
 
+## MLflow (Tracking + Registry)
+
+- UI (via `docker-compose`): `http://localhost:5000`
+- Pour que tes notebooks loggent dans le serveur (au lieu de creer un `mlflow.db` dans le dossier du notebook): utiliser `MLFLOW_TRACKING_URI=http://localhost:5000` (dans `.env` ou dans le notebook via `mlflow.set_tracking_uri(...)`).
+
 ## Tests
 
 ```bash
@@ -97,3 +102,4 @@ Voir `.env.example` pour la liste complète. Les variables clés :
 - [Dictionnaire de données](docs/data_dictionary.md)
 - [Dictionnaire API](docs/api_dictionary.md)
 - [CI/CD](docs/ci_cd.md)
+- [MLflow](docs/mlflow.md)
