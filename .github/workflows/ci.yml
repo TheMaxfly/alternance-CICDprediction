@@ -72,7 +72,7 @@ jobs:
         continue-on-error: true
 
   tests:
-    name: Tests (pytest + coverage)
+    name: Tests (unit + integration)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -89,11 +89,39 @@ jobs:
       - name: Run unit tests with coverage
         run: uv run pytest tests/unit/ -v --cov=briefml --cov-report=term-missing --cov-report=xml
 
+      - name: Run integration tests with local API
+        run: |
+          set -euo pipefail
+          uv run uvicorn briefml.api.predictor:app --host 127.0.0.1 --port 8000 > uvicorn.log 2>&1 &
+          API_PID=$!
+          cleanup() {
+            kill "$API_PID" || true
+            wait "$API_PID" || true
+          }
+          trap cleanup EXIT
+
+          for _ in {1..30}; do
+            if curl -fsS http://127.0.0.1:8000/health >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsS http://127.0.0.1:8000/health
+          API_URL=http://127.0.0.1:8000 uv run pytest tests/integration/ -v
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.xml
+
+      - name: Upload API log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uvicorn-log
+          path: uvicorn.log
 
   pre-commit:
     name: Pre-commit Hooks

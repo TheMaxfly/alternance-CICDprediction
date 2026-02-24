@@ -7,6 +7,8 @@ Tests verify that:
 3. All time_bucket options have proper labels
 """
 
+from pathlib import Path
+
 import pytest
 
 from briefml.ui.lib import reference_loader
@@ -31,7 +33,8 @@ class TestUS06TimeBucketDropdown:
         Then: Uses st.selectbox (not st.number_input or st.text_input)
         """
         # Read the page 5 source file
-        with open("streamlit_pages/5_Conditions.py") as f:
+        page_path = Path("briefml/ui/pages/5_Conditions.py")
+        with page_path.open(encoding="utf-8") as f:
             source = f.read()
 
         # Assert: time_bucket uses st.selectbox

@@ -1,0 +1,45 @@
+{
+  "run_name": "lgbm_auc_opt",
+  "optimized_for": "roc_auc",
+  "dataset": "/home/maxime/simplonalternance/alternance-CICDprediction/out/accidents_model_ready_kept_with_time_bucket.csv",
+  "target": "grave",
+  "seed": 42,
+  "cv_splits": 3,
+  "n_iter": 10,
+  "cv_best_score": 0.8092576183776811,
+  "threshold_05": 0.5,
+  "best_threshold_f1": 0.5599999999999999,
+  "metrics_05": {
+    "threshold": 0.5,
+    "accuracy": 0.7116939160031606,
+    "precision": 0.5694315004659832,
+    "recall": 0.823519501305703,
+    "f1": 0.6733014222252832,
+    "roc_auc": 0.8148121163132788,
+    "pr_auc": 0.7020097352685903
+  },
+  "metrics_best_f1": {
+    "threshold": 0.5599999999999999,
+    "accuracy": 0.7355801373609676,
+    "precision": 0.6037711143119026,
+    "recall": 0.7768511498610058,
+    "f1": 0.6794621477251795,
+    "roc_auc": 0.8148121163132788,
+    "pr_auc": 0.7020097352685903
+  },
+  "best_params": {
+    "model__subsample": 0.7,
+    "model__scale_pos_weight": 2.658,
+    "model__reg_lambda": 5.0,
+    "model__reg_alpha": 0.5,
+    "model__num_leaves": 63,
+    "model__n_estimators": 400,
+    "model__min_child_samples": 50,
+    "model__max_depth": 12,
+    "model__learning_rate": 0.05,
+    "model__colsample_bytree": 0.6
+  },
+  "model_path": "/home/maxime/simplonalternance/alternance-CICDprediction/out/lgbm_experiments/lgbm_auc_opt.joblib",
+  "predictions_path": "/home/maxime/simplonalternance/alternance-CICDprediction/out/lgbm_experiments/lgbm_auc_opt_predictions.csv",
+  "created_at_utc": "2026-02-24T15:57:58.735867+00:00"
+}

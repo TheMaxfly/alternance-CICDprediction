@@ -1,0 +1,43 @@
+{
+  "run_name": "logreg_f1_opt",
+  "optimized_for": "f1",
+  "dataset": "/home/maxime/simplonalternance/alternance-CICDprediction/out/accidents_model_ready_kept_with_time_bucket.csv",
+  "target": "grave",
+  "seed": 42,
+  "cv_splits": 3,
+  "n_iter": 24,
+  "cv_best_score": 0.6703739403729353,
+  "threshold_05": 0.5,
+  "best_threshold_f1": 0.49999999999999994,
+  "metrics_05": {
+    "threshold": 0.5,
+    "accuracy": 0.7286513097915274,
+    "precision": 0.5954946767073488,
+    "recall": 0.7727234436862943,
+    "f1": 0.6726306141154904,
+    "roc_auc": 0.8068527175015098,
+    "pr_auc": 0.6879774080891011
+  },
+  "metrics_best_f1": {
+    "threshold": 0.49999999999999994,
+    "accuracy": 0.7286513097915274,
+    "precision": 0.5954946767073488,
+    "recall": 0.7727234436862943,
+    "f1": 0.6726306141154904,
+    "roc_auc": 0.8068527175015098,
+    "pr_auc": 0.6879774080891011
+  },
+  "best_params": {
+    "model__solver": "liblinear",
+    "model__penalty": "l1",
+    "model__max_iter": 5000,
+    "model__class_weight": {
+      "0": 1,
+      "1": 2
+    },
+    "model__C": 3.0
+  },
+  "model_path": "/home/maxime/simplonalternance/alternance-CICDprediction/out/logreg_experiments/logreg_f1_opt.joblib",
+  "predictions_path": "/home/maxime/simplonalternance/alternance-CICDprediction/out/logreg_experiments/logreg_f1_opt_predictions.csv",
+  "created_at_utc": "2026-02-24T13:38:46.129829+00:00"
+}
