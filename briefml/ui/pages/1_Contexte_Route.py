@@ -11,9 +11,6 @@ from briefml.ui.lib import reference_loader, session_state
 
 def render():
     """Render Page 1: Contexte Route form fields."""
-    # Set current page
-    session_state.set_current_page(1)
-
     # Header
     st.header("Page 1 : Contexte Route")
     st.caption("Informations sur le departement, la route et l'agglomeration")
@@ -143,16 +140,17 @@ def render():
     st.divider()
 
     # Navigation buttons
+    def _go_next():
+        session_state.navigate_next()
+        session_state.update_form_complete_status()
+
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.button("← Precedent", disabled=True, width="stretch")
+        st.button("← Precedent", disabled=True, key="nav_prev_1")
 
     with col2:
-        if st.button("Suivant →", width="stretch", type="primary"):
-            session_state.navigate_next()
-            session_state.update_form_complete_status()
-            st.rerun()
+        st.button("Suivant →", type="primary", key="nav_next_1", on_click=_go_next)
 
     st.caption("Page 1/6 • 4 champs sur cette page")
 
