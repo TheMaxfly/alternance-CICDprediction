@@ -1,0 +1,60 @@
+{
+  "model_name": "catboost_hyperopt_best",
+  "created_at": "2026-02-25T15:31:38",
+  "threshold": 0.159932475087583,
+  "features": [
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket"
+  ],
+  "cat_features": [
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket"
+  ],
+  "catboost_params": {
+    "depth": 6,
+    "learning_rate": 0.022665704725668104,
+    "l2_leaf_reg": 45.74910419682211,
+    "random_strength": 1.7558856459356962,
+    "min_data_in_leaf": 82,
+    "border_count": 177,
+    "scale_pos_weight": 1.0045661847235805,
+    "bootstrap_type": "Bayesian",
+    "bagging_temperature": 0.1261304410537456
+  },
+  "metrics": {
+    "threshold": 0.159932,
+    "pr_auc": 0.715164,
+    "roc_auc": 0.821519,
+    "recall": 0.922332,
+    "precision": 0.490393,
+    "f1": 0.64033,
+    "f2": 0.784189,
+    "accuracy": 0.626208
+  }
+}

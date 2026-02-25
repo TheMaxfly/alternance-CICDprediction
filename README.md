@@ -1,6 +1,7 @@
-# BriefML — Prédiction de Gravité d'Accidents Routiers
+# BriefML — Prediction de Gravite d'Accidents Routiers
 
-Modèle CatBoost (`product15_v2_time_bucket`) exposé via une API FastAPI et une interface Streamlit multi-pages.
+Modele CatBoost (`product15_v2_time_bucket`) expose via une API FastAPI et une interface Streamlit multi-pages.
+Trois variantes de modeles sont disponibles, optimisees avec Optuna et Hyperopt.
 
 ## Structure du projet
 
@@ -10,13 +11,14 @@ BriefML/
 │   ├── api/
 │   │   └── predictor.py  # API FastAPI (CatBoost)
 │   └── ui/
-│       ├── app.py        # Entrée Streamlit
+│       ├── app.py        # Entree Streamlit
 │       ├── pages/        # 6 pages de formulaire
-│       └── lib/          # Modules partagés (client API, validation, etc.)
-├── data/                 # Données CSV + ref_options.json
-├── notebooks/            # Notebooks d'exploration/entraînement
-├── model/                # Modèle CatBoost (.cbm)
-├── artifacts/            # Méta-données du modèle (meta.json)
+│       └── lib/          # Modules partages (client API, validation, etc.)
+├── data/                 # Donnees CSV + ref_options.json
+├── notebooks/            # Notebooks d'exploration/entrainement
+├── model/                # Modeles CatBoost (.cbm)
+├── artifacts/            # Meta-donnees des modeles (meta.json)
+├── mlartifacts/          # Artifacts MLflow (modeles logges)
 ├── tests/
 │   ├── unit/
 │   └── integration/
@@ -24,25 +26,63 @@ BriefML/
 │   ├── Dockerfile        # Multi-stage : api + streamlit
 │   └── mlflow.Dockerfile
 ├── scripts/
-│   └── start.py          # Lanceur de développement local
+│   ├── start.py                # Lanceur de developpement local
+│   └── export_mlflow_models.py # Export des modeles depuis MLflow
 ├── docs/                 # Documentation technique
 ├── docker-compose.yml
+├── start_mlflow.sh       # Lanceur MLflow local
 └── pyproject.toml
 ```
 
-## Lancement rapide (développement)
+## Modeles disponibles
+
+Trois modeles CatBoost sont disponibles, chacun avec son fichier `.cbm` et son `_meta.json` :
+
+| Modele | Fichier .cbm | Optimisation | Threshold | PR AUC | Recall | Precision |
+|---|---|---|---|---|---|---|
+| **Original** | `catboost_product15_v2_time_bucket_final.cbm` | Optuna (equilibre) | 0.47 | — | — | — |
+| **Optuna recall** | `catboost_optuna_best.cbm` | Optuna 30 trials, F-beta(2) | 0.304 | 0.7147 | 0.9201 | 0.4948 |
+| **Hyperopt recall** | `catboost_hyperopt_best.cbm` | Hyperopt TPE 30 trials, F-beta(2) | 0.160 | 0.7154 | 0.9223 | 0.4904 |
+
+- **Original** : modele de base, seuil equilibre precision/recall
+- **Optuna recall** : optimise pour maximiser le recall (ne rater aucun accident grave), seuil F-beta(2), precision >= 0.30
+- **Hyperopt recall** : meme objectif avec Hyperopt (TPE bayesien), seuil plus bas, recall legerement superieur
+
+Les notebooks d'entrainement :
+- `notebooks/11catboost_check_time_columns.ipynb` — modele original
+- `notebooks/11c_catboost_optuna_recall_mlflow.ipynb` — Optuna
+- `notebooks/11d_catboost_hyperopt_recall_mlflow.ipynb` — Hyperopt
+
+## Lancement rapide (developpement)
 
 ```bash
+# Lance API + Streamlit ensemble (modele par defaut : original)
 uv run python scripts/start.py
 ```
 
 - API : `http://localhost:8000`
 - Interface : `http://localhost:8501`
 
-## Lancement séparé
+## Lancement avec choix du modele
 
-**API FastAPI :**
+L'API charge le modele et le threshold via les variables `MODEL_PATH` et `META_PATH`.
+
+**Modele original (par defaut) :**
 ```bash
+uv run uvicorn briefml.api.predictor:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Modele Optuna (recall optimise) :**
+```bash
+MODEL_PATH=model/catboost_optuna_best.cbm \
+META_PATH=artifacts/catboost_optuna_best_meta.json \
+uv run uvicorn briefml.api.predictor:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Modele Hyperopt (recall optimise) :**
+```bash
+MODEL_PATH=model/catboost_hyperopt_best.cbm \
+META_PATH=artifacts/catboost_hyperopt_best_meta.json \
 uv run uvicorn briefml.api.predictor:app --host 0.0.0.0 --port 8000 --reload
 ```
 
@@ -51,24 +91,46 @@ uv run uvicorn briefml.api.predictor:app --host 0.0.0.0 --port 8000 --reload
 API_URL=http://localhost:8000 uv run streamlit run briefml/ui/app.py
 ```
 
-**Vérifier l'API :**
+**Verifier l'API (affiche le modele charge et son threshold) :**
 ```bash
-curl -s http://localhost:8000/health
+curl -s http://localhost:8000/health | python3 -m json.tool
 ```
+
+## Export des modeles depuis MLflow
+
+Si les fichiers `.cbm` ne sont pas presents localement, ils peuvent etre extraits depuis MLflow :
+
+```bash
+# Prerequis : MLflow doit tourner (voir readme_mlflow.md)
+./start_mlflow.sh
+
+# Exporter les modeles Optuna et Hyperopt depuis MLflow
+uv run python scripts/export_mlflow_models.py
+```
+
+Voir [readme_mlflow.md](readme_mlflow.md) pour le guide complet MLflow.
 
 ## Docker
 
 ```bash
-# Copier et configurer les variables d'environnement
+# Configurer les variables d'environnement
 cp .env.example .env
-# Éditer .env avec vos valeurs (POSTGRES_PASSWORD obligatoire)
+# Editer .env (POSTGRES_PASSWORD obligatoire)
 
-# Lancer tous les services
+# Lancer tous les services (API + Streamlit + MLflow + PostgreSQL)
 docker-compose up --build
 
 # Build manuel des images
 docker build -f docker/Dockerfile --target api -t briefml-api .
 docker build -f docker/Dockerfile --target streamlit -t briefml-ui .
+```
+
+Pour changer de modele en Docker, modifier les variables dans `docker-compose.yml` :
+```yaml
+api:
+  environment:
+    MODEL_PATH: /app/model/catboost_optuna_best.cbm
+    META_PATH: /app/artifacts/catboost_optuna_best_meta.json
 ```
 
 ## Tests
@@ -77,13 +139,13 @@ docker build -f docker/Dockerfile --target streamlit -t briefml-ui .
 # Tests unitaires
 uv run pytest tests/unit/ -v
 
-# Tests d'intégration (API doit être démarrée)
+# Tests d'integration (API doit etre demarree)
 API_URL=http://localhost:8000 uv run pytest tests/integration/ -v
 ```
 
-## Données et notebooks (GitHub)
+## Donnees et notebooks (GitHub)
 
-Les fichiers lourds (`.cbm`, `.csv`, `.parquet`, notebooks volumineux) sont gérés via **Git LFS**.
+Les fichiers lourds (`.cbm`, `.csv`, `.parquet`, notebooks volumineux) sont geres via **Git LFS**.
 
 ```bash
 git lfs install
@@ -97,18 +159,19 @@ Voir aussi :
 
 ## Variables d'environnement
 
-Voir `.env.example` pour la liste complète. Les variables clés :
+Voir `.env.example` pour la liste complete. Les variables cles :
 
-| Variable | Défaut | Description |
+| Variable | Defaut | Description |
 |---|---|---|
-| `MODEL_PATH` | `model/catboost_product15_v2_time_bucket_final.cbm` | Chemin du modèle |
-| `META_PATH` | `artifacts/catboost_product15_v2_time_bucket_final_meta.json` | Méta-données |
-| `MISSING_CAT` | `__MISSING__` | Token pour les catégorielles manquantes |
+| `MODEL_PATH` | `model/catboost_product15_v2_time_bucket_final.cbm` | Chemin du modele .cbm |
+| `META_PATH` | `artifacts/catboost_product15_v2_time_bucket_final_meta.json` | Meta-donnees (threshold, features) |
+| `MISSING_CAT` | `__MISSING__` | Token pour les categorielles manquantes |
 | `API_URL` | `http://localhost:8000` | URL de l'API (pour Streamlit) |
 | `POSTGRES_PASSWORD` | *(requis)* | Mot de passe PostgreSQL |
 
 ## Documentation
 
-- [Dictionnaire de données](docs/data_dictionary.md)
+- [readme_mlflow.md](readme_mlflow.md) — Guide MLflow (tracking, export, chargement)
+- [Dictionnaire de donnees](docs/data_dictionary.md)
 - [Dictionnaire API](docs/api_dictionary.md)
 - [CI/CD](docs/ci_cd.md)

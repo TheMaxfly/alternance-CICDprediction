@@ -1,0 +1,61 @@
+{
+  "model_name": "catboost_optuna_best",
+  "created_at": "2026-02-25T15:39:56",
+  "threshold": 0.3037276981364445,
+  "features": [
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket"
+  ],
+  "cat_features": [
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket"
+  ],
+  "catboost_params": {
+    "depth": 6,
+    "learning_rate": 0.027504715273577205,
+    "l2_leaf_reg": 2.8101381544610207,
+    "random_strength": 7.002382971510138,
+    "min_data_in_leaf": 66,
+    "border_count": 144,
+    "scale_pos_weight": 2.3500437628674695,
+    "bootstrap_type": "Bayesian",
+    "bagging_temperature": 0.3199484315837708
+  },
+  "metrics": {
+    "threshold": 0.303728,
+    "pr_auc": 0.714672,
+    "roc_auc": 0.821642,
+    "recall": 0.920057,
+    "precision": 0.49479,
+    "f1": 0.643512,
+    "f2": 0.7851,
+    "accuracy": 0.632256
+  },
+  "mlflow_run_id": "f66bc2e7987d4740bcfe6b03f1986662"
+}
