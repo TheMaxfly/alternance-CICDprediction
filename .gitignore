@@ -10,13 +10,14 @@ wheels/
 .venv
 
 # Data exports / large files
-*.csv
-*.parquet
+# NOTE:
+# - CSV/Parquet under `data/` are intentionally versioned (or managed via Git LFS).
+# - Generated exports should go under `out/`.
+out/**/*.csv
+out/**/*.parquet
 
 # Notebooks
-*.ipynb
 .ipynb_checkpoints/
-notebooks/
 
 # Local env / secrets
 .env
@@ -28,3 +29,6 @@ notebooks/
 
 # Local AI agent tooling (not needed in repo)
 .claude/
+
+# MkDocs generated site
+site/

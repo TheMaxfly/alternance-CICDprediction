@@ -14,6 +14,7 @@ BriefML/
 │       ├── pages/        # 6 pages de formulaire
 │       └── lib/          # Modules partagés (client API, validation, etc.)
 ├── data/                 # Données CSV + ref_options.json
+├── notebooks/            # Notebooks d'exploration/entraînement
 ├── model/                # Modèle CatBoost (.cbm)
 ├── artifacts/            # Méta-données du modèle (meta.json)
 ├── tests/
@@ -79,6 +80,20 @@ uv run pytest tests/unit/ -v
 # Tests d'intégration (API doit être démarrée)
 API_URL=http://localhost:8000 uv run pytest tests/integration/ -v
 ```
+
+## Données et notebooks (GitHub)
+
+Les fichiers lourds (`.cbm`, `.csv`, `.parquet`, notebooks volumineux) sont gérés via **Git LFS**.
+
+```bash
+git lfs install
+git lfs pull
+git lfs ls-files
+```
+
+Voir aussi :
+- `data/README.md`
+- `notebooks/README.md`
 
 ## Variables d'environnement
 

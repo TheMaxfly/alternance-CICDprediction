@@ -11,8 +11,6 @@ from briefml.ui.lib import api_client, reference_loader, session_state, validati
 
 def render():
     """Render Page 6: Recap table and prediction."""
-    session_state.set_current_page(6)
-
     st.header("Page 6 : Recapitulatif et Prediction")
     st.caption("Verifiez vos saisies avant de lancer la prediction")
 
@@ -145,11 +143,12 @@ def render():
     st.divider()
 
     # Navigation
+    def _go_prev():
+        session_state.navigate_previous()
+
     col1, col2 = st.columns([1, 1])
     with col1:
-        if st.button("← Precedent", width="stretch"):
-            session_state.navigate_previous()
-            st.rerun()
+        st.button("← Precedent", key="nav_prev_6", on_click=_go_prev)
     with col2:
         st.caption("Vous etes sur la derniere page")
 

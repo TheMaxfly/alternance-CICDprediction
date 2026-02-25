@@ -11,8 +11,6 @@ from briefml.ui.lib import reference_loader, session_state
 
 def render():
     """Render Page 3: Collision form fields."""
-    session_state.set_current_page(3)
-
     st.header("Page 3 : Collision")
     st.caption("Type de collision, point de choc et manoeuvre")
 
@@ -103,16 +101,18 @@ def render():
     st.divider()
 
     # Navigation
+    def _go_prev():
+        session_state.navigate_previous()
+
+    def _go_next():
+        session_state.navigate_next()
+        session_state.update_form_complete_status()
+
     col1, col2 = st.columns([1, 1])
     with col1:
-        if st.button("← Precedent", width="stretch"):
-            session_state.navigate_previous()
-            st.rerun()
+        st.button("← Precedent", key="nav_prev_3", on_click=_go_prev)
     with col2:
-        if st.button("Suivant →", width="stretch", type="primary"):
-            session_state.navigate_next()
-            session_state.update_form_complete_status()
-            st.rerun()
+        st.button("Suivant →", type="primary", key="nav_next_3", on_click=_go_next)
 
     st.caption("Page 3/6 • 3 champs sur cette page")
 
