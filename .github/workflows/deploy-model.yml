@@ -1,0 +1,199 @@
+name: Deploy Model
+
+# Workflow pour deployer un modele CatBoost specifique sur l'API.
+# Permet de changer de modele (original, optuna, hyperopt) sans rebuild Docker.
+#
+# Usage :
+#   1. Declenchement manuel via GitHub Actions UI
+#   2. Choisir le modele dans la liste
+#   3. Le workflow rebuild et redeploy l'API avec le bon MODEL_NAME
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_name:
+        description: "Nom du modele CatBoost a deployer"
+        required: true
+        type: choice
+        options:
+          - catboost_product15_v2_time_bucket_final
+          - catboost_optuna_best
+          - catboost_hyperopt_best
+      environment:
+        description: "Environnement cible"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - staging
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+concurrency:
+  group: deploy-model-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_BASE: ghcr.io/${{ github.repository_owner }}/alternance-cicdprediction
+
+jobs:
+  validate:
+    name: Validate model files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Check model and meta files exist
+        run: |
+          set -euo pipefail
+          MODEL_NAME="${{ github.event.inputs.model_name }}"
+
+          CBM="model/${MODEL_NAME}.cbm"
+          META="artifacts/${MODEL_NAME}_meta.json"
+
+          echo "Checking model: ${CBM}"
+          if [[ ! -f "${CBM}" ]]; then
+            echo "::error::Model file not found: ${CBM}"
+            exit 1
+          fi
+
+          echo "Checking meta: ${META}"
+          if [[ ! -f "${META}" ]]; then
+            echo "::error::Meta file not found: ${META}"
+            exit 1
+          fi
+
+          # Afficher les infos du modele
+          echo "## Model Info" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Name:** ${MODEL_NAME}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **CBM size:** $(du -h "${CBM}" | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Meta:**" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat "${META}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  build-and-push:
+    name: Build API with selected model
+    runs-on: ubuntu-latest
+    needs: validate
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: api
+          push: true
+          tags: |
+            ${{ env.IMAGE_BASE }}-api:model-${{ github.event.inputs.model_name }}
+            ${{ env.IMAGE_BASE }}-api:git-${{ github.sha }}
+          build-args: |
+            MODEL_NAME=${{ github.event.inputs.model_name }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Azure Login (AZURE_CREDENTIALS)
+        if: ${{ secrets.AZURE_CREDENTIALS != '' }}
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure Login (OIDC)
+        if: ${{ secrets.AZURE_CREDENTIALS == '' }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy API with new model
+        uses: azure/cli@v2
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          CONTAINER_APP_NAME: ${{ vars.AZURE_CONTAINER_APP_API_NAME }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          MODEL_NAME: ${{ github.event.inputs.model_name }}
+          IMAGE: ${{ env.IMAGE_BASE }}-api:model-${{ github.event.inputs.model_name }}
+        with:
+          inlineScript: |
+            set -euo pipefail
+            az extension add --name containerapp --upgrade
+
+            az containerapp update \
+              --name "${CONTAINER_APP_NAME}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --image "${IMAGE}" \
+              --registry-server "${{ env.REGISTRY }}" \
+              --registry-username "${GHCR_USERNAME}" \
+              --registry-password "${GHCR_TOKEN}" \
+              --set-env-vars \
+                "MODEL_PATH=/app/model/${MODEL_NAME}.cbm" \
+                "META_PATH=/app/artifacts/${MODEL_NAME}_meta.json" \
+                "MISSING_CAT=__MISSING__"
+
+            fqdn="$(az containerapp show \
+              --name "${CONTAINER_APP_NAME}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --query "properties.configuration.ingress.fqdn" -o tsv)"
+
+            echo "fqdn=${fqdn}" >> "${GITHUB_OUTPUT}"
+
+      - name: Health check
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://${{ steps.deploy_api.outputs.fqdn || 'localhost' }}/health"
+          echo "Health check: ${url}"
+
+          for _ in $(seq 1 30); do
+            if response=$(curl -fsS --max-time 10 "${url}" 2>/dev/null); then
+              echo "API is healthy"
+              echo "${response}" | python3 -m json.tool
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "::error::Health check failed after 150s"
+          exit 1
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "## Deployment Result" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Model:** ${{ github.event.inputs.model_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Environment:** ${{ github.event.inputs.environment }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Image:** ${{ env.IMAGE_BASE }}-api:model-${{ github.event.inputs.model_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Status:** ${{ job.status }}" >> "$GITHUB_STEP_SUMMARY"

@@ -112,6 +112,8 @@ Voir [readme_mlflow.md](readme_mlflow.md) pour le guide complet MLflow.
 
 ## Docker
 
+### Lancement
+
 ```bash
 # Configurer les variables d'environnement
 cp .env.example .env
@@ -119,18 +121,73 @@ cp .env.example .env
 
 # Lancer tous les services (API + Streamlit + MLflow + PostgreSQL)
 docker-compose up --build
-
-# Build manuel des images
-docker build -f docker/Dockerfile --target api -t briefml-api .
-docker build -f docker/Dockerfile --target streamlit -t briefml-ui .
 ```
 
-Pour changer de modele en Docker, modifier les variables dans `docker-compose.yml` :
-```yaml
-api:
-  environment:
-    MODEL_PATH: /app/model/catboost_optuna_best.cbm
-    META_PATH: /app/artifacts/catboost_optuna_best_meta.json
+Services exposes :
+- API FastAPI : `http://localhost:8000`
+- Streamlit : `http://localhost:8501`
+- MLflow UI : `http://localhost:5000`
+- PostgreSQL : `localhost:5432`
+
+### Choisir le modele
+
+Par defaut l'API charge le modele original. Pour utiliser un autre modele,
+passer la variable `MODEL_NAME` :
+
+```bash
+# Modele Optuna
+MODEL_NAME=catboost_optuna_best docker-compose up --build
+
+# Modele Hyperopt
+MODEL_NAME=catboost_hyperopt_best docker-compose up --build
+```
+
+### Test du workflow complet
+
+```bash
+# 1. Lancer les services
+docker-compose up --build -d
+
+# 2. Verifier que tout est healthy
+docker-compose ps
+
+# 3. Tester MLflow
+curl -s http://localhost:5000/health
+
+# 4. Tester l'API (affiche modele + threshold)
+curl -s http://localhost:8000/health | python3 -m json.tool
+
+# 5. Tester une prediction
+curl -s -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"data":{"dep":"75","lum":"1","atm":"1","catr":"3","agg":"1","int":"1","circ":"2","col":"6","vma_bucket":"50","catv_family_4":"car","manv_mode":"straight","driver_age_bucket":"25-34","choc_mode":"front","driver_trajet_family":"commute","time_bucket":"morning_rush"}}' \
+  | python3 -m json.tool
+
+# 6. Ouvrir Streamlit
+# http://localhost:8501
+
+# 7. Arreter
+docker-compose down
+```
+
+### Volumes persistants
+
+| Volume | Contenu | Persistence |
+|---|---|---|
+| `pgdata` | Base PostgreSQL (metriques, params MLflow) | Survit aux `docker-compose down` |
+| `mlflow_artifacts` | Modeles logges, graphiques, CSV | Survit aux `docker-compose down` |
+
+Pour supprimer les volumes (reset complet) :
+```bash
+docker-compose down -v
+```
+
+### Build manuel
+
+```bash
+docker build -f docker/Dockerfile --target api -t briefml-api .
+docker build -f docker/Dockerfile --target streamlit -t briefml-ui .
+docker build -f docker/mlflow.Dockerfile -t briefml-mlflow .
 ```
 
 ## Tests
@@ -163,11 +220,36 @@ Voir `.env.example` pour la liste complete. Les variables cles :
 
 | Variable | Defaut | Description |
 |---|---|---|
-| `MODEL_PATH` | `model/catboost_product15_v2_time_bucket_final.cbm` | Chemin du modele .cbm |
-| `META_PATH` | `artifacts/catboost_product15_v2_time_bucket_final_meta.json` | Meta-donnees (threshold, features) |
+| `MODEL_NAME` | `catboost_product15_v2_time_bucket_final` | Nom du modele (Docker : construit MODEL_PATH et META_PATH) |
+| `MODEL_PATH` | `model/{MODEL_NAME}.cbm` | Chemin du modele .cbm |
+| `META_PATH` | `artifacts/{MODEL_NAME}_meta.json` | Meta-donnees (threshold, features) |
 | `MISSING_CAT` | `__MISSING__` | Token pour les categorielles manquantes |
 | `API_URL` | `http://localhost:8000` | URL de l'API (pour Streamlit) |
+| `MLFLOW_TRACKING_URI` | `http://mlflow:5000` | URL MLflow (Docker, interne) |
 | `POSTGRES_PASSWORD` | *(requis)* | Mot de passe PostgreSQL |
+
+## CI/CD (GitHub Actions)
+
+6 workflows automatises + 1 workflow de deploiement de modele :
+
+| Workflow | Declencheur | Description |
+|---|---|---|
+| `ci.yml` | Push/PR sur develop | Lint (Ruff), types (Pyright), securite (Bandit), tests + coverage |
+| `build.yml` | Push sur develop/main | Build et push des images Docker vers GHCR |
+| `release.yml` | Apres CI sur main | Semantic versioning automatique |
+| `cd-azure.yml` | Release ou manuel | Deploiement sur Azure Container Apps |
+| `deploy-model.yml` | Manuel | Deployer un modele specifique (original/optuna/hyperopt) |
+| `docs.yml` | Push sur main | Build et deploy de la documentation MkDocs |
+| `sync-develop.yml` | Tag de release | Sync main → develop apres release |
+
+### Deployer un modele en production
+
+Le workflow `deploy-model.yml` permet de changer de modele sans modifier le code :
+
+1. Aller dans **Actions > Deploy Model > Run workflow**
+2. Choisir le modele : `catboost_optuna_best`, `catboost_hyperopt_best`, ou l'original
+3. Choisir l'environnement : `production` ou `staging`
+4. Le workflow valide les fichiers, rebuild l'image et deploie
 
 ## Documentation
 

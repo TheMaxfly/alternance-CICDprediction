@@ -31,6 +31,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
 
   # ── API FastAPI (prediction CatBoost) ────────────────────────────────
   api:
@@ -39,11 +45,15 @@ services:
       dockerfile: docker/Dockerfile
       target: api
     environment:
-      MODEL_PATH: /app/model/catboost_product15_v2_time_bucket_final.cbm
-      META_PATH: /app/artifacts/catboost_product15_v2_time_bucket_final_meta.json
+      MODEL_PATH: /app/model/${MODEL_NAME:-catboost_product15_v2_time_bucket_final}.cbm
+      META_PATH: /app/artifacts/${MODEL_NAME:-catboost_product15_v2_time_bucket_final}_meta.json
       MISSING_CAT: ${MISSING_CAT:-__MISSING__}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
     ports:
       - "8000:8000"
+    depends_on:
+      mlflow:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

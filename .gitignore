@@ -18,6 +18,18 @@ out/**/*.parquet
 
 # Notebooks
 .ipynb_checkpoints/
+catboost_info/
+
+# Tests
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+coverage.xml
+
+# MLflow (local dev)
+mlflow.db
+mlartifacts/
 
 # Local env / secrets
 .env
