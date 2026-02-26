@@ -5,7 +5,8 @@ Usage (depuis la racine du projet) :
     python scripts/export_mlflow_models.py
 
 Prerequis : MLflow server accessible sur http://127.0.0.1:5000
-    mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlartifacts
+    mlflow server --backend-store-uri sqlite:///mlflow.db \
+        --default-artifact-root ./mlartifacts
 
 Ce script :
 1. Charge les meilleurs runs Optuna et Hyperopt depuis MLflow
@@ -22,7 +23,6 @@ from datetime import datetime
 from pathlib import Path
 
 import mlflow
-from catboost import CatBoostClassifier
 
 # --- Config ---
 MLFLOW_TRACKING_URI = "http://127.0.0.1:5000"
@@ -31,9 +31,21 @@ MODEL_DIR = ROOT / "model"
 ARTIFACTS_DIR = ROOT / "artifacts"
 
 FEATURES = [
-    "dep", "lum", "atm", "catr", "agg", "int", "circ", "col",
-    "vma_bucket", "catv_family_4", "manv_mode", "driver_age_bucket",
-    "choc_mode", "driver_trajet_family", "time_bucket",
+    "dep",
+    "lum",
+    "atm",
+    "catr",
+    "agg",
+    "int",
+    "circ",
+    "col",
+    "vma_bucket",
+    "catv_family_4",
+    "manv_mode",
+    "driver_age_bucket",
+    "choc_mode",
+    "driver_trajet_family",
+    "time_bucket",
 ]
 
 # Experiments et run IDs connus (mis a jour apres chaque execution des notebooks)
@@ -50,11 +62,11 @@ MODELS = {
 
 
 def export_model(model_name: str, run_id: str, experiment_name: str) -> None:
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Export: {model_name}")
     print(f"  Run ID     : {run_id}")
     print(f"  Experiment : {experiment_name}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Charger le modele depuis MLflow
     model_uri = f"runs:/{run_id}/model"
@@ -78,9 +90,16 @@ def export_model(model_name: str, run_id: str, experiment_name: str) -> None:
 
     # Recuperer les hyperparametres CatBoost depuis les params MLflow
     catboost_param_keys = [
-        "depth", "learning_rate", "l2_leaf_reg", "random_strength",
-        "min_data_in_leaf", "border_count", "scale_pos_weight",
-        "bootstrap_type", "bagging_temperature", "subsample",
+        "depth",
+        "learning_rate",
+        "l2_leaf_reg",
+        "random_strength",
+        "min_data_in_leaf",
+        "border_count",
+        "scale_pos_weight",
+        "bootstrap_type",
+        "bagging_temperature",
+        "subsample",
     ]
     catboost_params = {}
     for k in catboost_param_keys:
@@ -102,9 +121,19 @@ def export_model(model_name: str, run_id: str, experiment_name: str) -> None:
         "cat_features": FEATURES,
         "catboost_params": catboost_params,
         "metrics": {
-            k: round(v, 6) for k, v in metrics.items()
-            if k in ("threshold", "pr_auc", "roc_auc", "recall",
-                     "precision", "f1", "f2", "accuracy")
+            k: round(v, 6)
+            for k, v in metrics.items()
+            if k
+            in (
+                "threshold",
+                "pr_auc",
+                "roc_auc",
+                "recall",
+                "precision",
+                "f1",
+                "f2",
+                "accuracy",
+            )
         },
         "mlflow_run_id": run_id,
         "mlflow_experiment": experiment_name,
@@ -117,12 +146,12 @@ def export_model(model_name: str, run_id: str, experiment_name: str) -> None:
     print(f"  meta.json exporte : {meta_path}")
 
     # Resume
-    print(f"\n  Metriques :")
+    print("\n  Metriques :")
     for k in ("pr_auc", "roc_auc", "recall", "precision", "f1", "f2", "threshold"):
         if k in metrics:
             print(f"    {k:12s}: {metrics[k]:.4f}")
 
-    print(f"\n  Utilisation dans predictor.py :")
+    print("\n  Utilisation dans predictor.py :")
     print(f"    MODEL_PATH={cbm_path}")
     print(f"    META_PATH={meta_path}")
 
@@ -136,13 +165,15 @@ def main() -> None:
             export_model(model_name, config["run_id"], config["experiment_name"])
         except Exception as e:
             print(f"\nERREUR pour {model_name}: {e}", file=sys.stderr)
-            print("  Verifiez que MLflow server est lance et que le run_id est correct.")
+            print(
+                "  Verifiez que MLflow server est lance et que le run_id est correct."
+            )
             continue
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("Export termine.")
     print(f"Fichiers dans : {MODEL_DIR} et {ARTIFACTS_DIR}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
 
 if __name__ == "__main__":
