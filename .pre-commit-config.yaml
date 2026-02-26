@@ -1,4 +1,4 @@
-exclude: ^(out/|\.specify/)
+exclude: ^(out/|\.specify/|model/)
 
 repos:
   # ── Hooks de base ─────────────────────────────────────────────────────────
@@ -6,7 +6,9 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace        # Supprime les espaces en fin de ligne
+        exclude: '\.cbm$'
       - id: end-of-file-fixer          # Assure une ligne vide en fin de fichier
+        exclude: '\.cbm$'
       - id: check-yaml                 # Valide la syntaxe YAML
       - id: check-added-large-files    # Bloque les fichiers > 500KB
       - id: detect-private-key         # Détecte les clés privées commitées
