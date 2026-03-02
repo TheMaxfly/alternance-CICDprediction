@@ -8,11 +8,15 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-mlflow}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-briefml}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-briefml} -d ${POSTGRES_DB:-mlflow}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -75,6 +79,55 @@ services:
       api:
         condition: service_healthy
 
+  # ── Prometheus (collecte des métriques) ─────────────────────────────
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # ── Grafana (dashboards) ────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  # ── Node Exporter (métriques hôte) ─────────────────────────────────
+  node-exporter:
+    image: quay.io/prometheus/node-exporter
+    ports:
+      - "9100:9100"
+    pid: "host"
+    command:
+      - --path.rootfs=/host
+    volumes:
+      - /:/host:ro,rslave
+
+  # ── cAdvisor (métriques conteneurs) ────────────────────────────────
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+
 volumes:
   pgdata:
   mlflow_artifacts:
+  prometheus_data:
+  grafana_data:

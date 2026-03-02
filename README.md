@@ -25,12 +25,20 @@ BriefML/
 ├── docker/               # Dockerfiles
 │   ├── Dockerfile        # Multi-stage : api + streamlit
 │   └── mlflow.Dockerfile
+├── monitoring/           # Configuration monitoring + dashboard Grafana
+│   ├── prometheus.yml
+│   └── grafana-dashboard.json
 ├── scripts/
 │   ├── start.py                # Lanceur de developpement local
+│   ├── start_monitoring.sh     # Lanceur stack monitoring + URLs utiles
 │   └── export_mlflow_models.py # Export des modeles depuis MLflow
 ├── docs/                 # Documentation technique
+├── DASHBOARD_DESIGN.md   # Justification du dashboard Grafana
 ├── docker-compose.yml
+├── locustfile.py         # Scenario Locust pour /predict
+├── stresstest.md         # Rapport de stress test
 ├── start_mlflow.sh       # Lanceur MLflow local
+├── .env.example          # Variables attendues pour Docker Compose
 └── pyproject.toml
 ```
 
@@ -112,6 +120,17 @@ Voir [readme_mlflow.md](readme_mlflow.md) pour le guide complet MLflow.
 
 ## Docker
 
+La stack Docker Compose integre desormais :
+
+- API FastAPI
+- Streamlit
+- MLflow
+- PostgreSQL
+- Prometheus
+- Grafana
+- node-exporter
+- cAdvisor
+
 ### Lancement
 
 ```bash
@@ -119,15 +138,32 @@ Voir [readme_mlflow.md](readme_mlflow.md) pour le guide complet MLflow.
 cp .env.example .env
 # Editer .env (POSTGRES_PASSWORD obligatoire)
 
-# Lancer tous les services (API + Streamlit + MLflow + PostgreSQL)
-docker-compose up --build
+# Lancer toute la stack (app + monitoring)
+docker compose up --build
+```
+
+Lanceur pratique (demarre la stack, attend les endpoints et ouvre les interfaces) :
+
+```bash
+./scripts/start_monitoring.sh
+```
+
+Avec Locust :
+
+```bash
+./scripts/start_monitoring.sh --with-locust
 ```
 
 Services exposes :
 - API FastAPI : `http://localhost:8000`
+- Metrics Prometheus (API) : `http://localhost:8000/metrics`
 - Streamlit : `http://localhost:8501`
 - MLflow UI : `http://localhost:5000`
-- PostgreSQL : `localhost:5432`
+- Prometheus : `http://localhost:9090`
+- Grafana : `http://localhost:3000`
+- node-exporter : `http://localhost:9100`
+- cAdvisor : `http://localhost:8080`
+- PostgreSQL (conteneur) : `localhost:5433`
 
 ### Choisir le modele
 
@@ -136,20 +172,20 @@ passer la variable `MODEL_NAME` :
 
 ```bash
 # Modele Optuna
-MODEL_NAME=catboost_optuna_best docker-compose up --build
+MODEL_NAME=catboost_optuna_best docker compose up --build
 
 # Modele Hyperopt
-MODEL_NAME=catboost_hyperopt_best docker-compose up --build
+MODEL_NAME=catboost_hyperopt_best docker compose up --build
 ```
 
 ### Test du workflow complet
 
 ```bash
 # 1. Lancer les services
-docker-compose up --build -d
+docker compose up --build -d
 
 # 2. Verifier que tout est healthy
-docker-compose ps
+docker compose ps
 
 # 3. Tester MLflow
 curl -s http://localhost:5000/health
@@ -157,17 +193,23 @@ curl -s http://localhost:5000/health
 # 4. Tester l'API (affiche modele + threshold)
 curl -s http://localhost:8000/health | python3 -m json.tool
 
-# 5. Tester une prediction
+# 5. Tester le endpoint /metrics
+curl -s http://localhost:8000/metrics | rg "prediction_|app_uptime_seconds"
+
+# 6. Tester une prediction
 curl -s -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"data":{"dep":"75","lum":"1","atm":"1","catr":"3","agg":"1","int":"1","circ":"2","col":"6","vma_bucket":"50","catv_family_4":"car","manv_mode":"straight","driver_age_bucket":"25-34","choc_mode":"front","driver_trajet_family":"commute","time_bucket":"morning_rush"}}' \
   | python3 -m json.tool
 
-# 6. Ouvrir Streamlit
-# http://localhost:8501
+# 7. Verifier les targets Prometheus
+# http://localhost:9090/targets
 
-# 7. Arreter
-docker-compose down
+# 8. Ouvrir Grafana
+# http://localhost:3000
+
+# 9. Arreter
+docker compose down
 ```
 
 ### Volumes persistants
@@ -176,10 +218,12 @@ docker-compose down
 |---|---|---|
 | `pgdata` | Base PostgreSQL (metriques, params MLflow) | Survit aux `docker-compose down` |
 | `mlflow_artifacts` | Modeles logges, graphiques, CSV | Survit aux `docker-compose down` |
+| `prometheus_data` | Historique des series temporelles Prometheus | Survit aux `docker-compose down` |
+| `grafana_data` | Dashboards, datasources, preferences Grafana | Survit aux `docker-compose down` |
 
 Pour supprimer les volumes (reset complet) :
 ```bash
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Build manuel
@@ -189,6 +233,56 @@ docker build -f docker/Dockerfile --target api -t briefml-api .
 docker build -f docker/Dockerfile --target streamlit -t briefml-ui .
 docker build -f docker/mlflow.Dockerfile -t briefml-mlflow .
 ```
+
+## Monitoring et Observabilite
+
+L'API expose des metriques Prometheus via `prometheus_client` sur :
+
+- `GET /metrics`
+
+Metriques custom principales :
+
+- `prediction_requests_total`
+- `prediction_results_total{label="grave|non_grave"}`
+- `prediction_request_duration_seconds`
+- `prediction_validation_errors_total`
+- `prediction_http_errors_total{status_code="..."}`
+- `app_uptime_seconds`
+
+Prometheus scrape 4 jobs :
+
+- `fastapi`
+- `node-exporter`
+- `cadvisor`
+- `prometheus`
+
+Le dashboard Grafana versionne dans le repo se trouve ici :
+
+- `monitoring/grafana-dashboard.json`
+
+Le document de conception associe est :
+
+- `DASHBOARD_DESIGN.md`
+
+## Stress testing (Locust)
+
+Le scenario de test de charge est fourni dans :
+
+- `locustfile.py`
+
+Lancement manuel :
+
+```bash
+uv run locust -f locustfile.py --host http://localhost:8000
+```
+
+Interface web :
+
+- `http://localhost:8089`
+
+Le rapport de test de charge se trouve dans :
+
+- `stresstest.md`
 
 ## Tests
 
@@ -226,7 +320,11 @@ Voir `.env.example` pour la liste complete. Les variables cles :
 | `MISSING_CAT` | `__MISSING__` | Token pour les categorielles manquantes |
 | `API_URL` | `http://localhost:8000` | URL de l'API (pour Streamlit) |
 | `MLFLOW_TRACKING_URI` | `http://mlflow:5000` | URL MLflow (Docker, interne) |
+| `POSTGRES_USER` | `briefml` | Utilisateur PostgreSQL |
 | `POSTGRES_PASSWORD` | *(requis)* | Mot de passe PostgreSQL |
+| `POSTGRES_DB` | `mlflow` | Base PostgreSQL utilisee par MLflow |
+| `GRAFANA_ADMIN_USER` | `admin` | Utilisateur admin Grafana |
+| `GRAFANA_ADMIN_PASSWORD` | `admin` | Mot de passe admin Grafana |
 
 ## CI/CD (GitHub Actions)
 

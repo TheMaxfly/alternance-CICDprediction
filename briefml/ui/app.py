@@ -15,7 +15,7 @@ import logging
 
 import streamlit as st
 
-from briefml.ui.lib import reference_loader, session_state
+from briefml.ui.lib import api_client, reference_loader, session_state
 
 # Configure logging (T095)
 logging.basicConfig(
@@ -66,6 +66,43 @@ with st.sidebar:
     if st.button("Nouvelle prediction", width="stretch"):
         session_state.reset_form()
         st.rerun()
+
+    st.divider()
+
+    st.subheader("Modele")
+    model_response = api_client.get_available_models()
+    if "error" in model_response:
+        st.warning(model_response["message"])
+    else:
+        available_models = model_response.get("available_models", [])
+        active_model = model_response.get("active_model")
+
+        if available_models:
+            if active_model in available_models:
+                selected_index = available_models.index(active_model)
+            else:
+                selected_index = 0
+
+            selected_model = st.selectbox(
+                "Modele utilise par l'API",
+                options=available_models,
+                index=selected_index,
+            )
+
+            if active_model:
+                st.caption(f"Modele actif : `{active_model}`")
+
+            if selected_model != active_model:
+                if st.button("Appliquer le modele", width="stretch"):
+                    switch_response = api_client.select_model(selected_model)
+                    if "error" in switch_response:
+                        st.error(switch_response["message"])
+                    else:
+                        session_state.set_last_prediction(None)
+                        st.success(f"Modele actif mis a jour : {selected_model}")
+                        st.rerun()
+        else:
+            st.warning("Aucun modele selectable n'a ete trouve dans l'API.")
 
     st.divider()
 

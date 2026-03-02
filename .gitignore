@@ -34,6 +34,7 @@ mlartifacts/
 # Local env / secrets
 .env
 .env.*
+!.env.example
 .streamlit/secrets.toml
 
 # Spec Kit / agent prompts (may contain local credentials depending on tooling)

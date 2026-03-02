@@ -13,7 +13,7 @@ import time
 from typing import Any
 
 import requests
-from requests.exceptions import RequestException, Timeout
+from requests.exceptions import ConnectionError, RequestException, Timeout
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 # API configuration
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 PREDICT_ENDPOINT = f"{API_URL}/predict"
+MODELS_ENDPOINT = f"{API_URL}/models"
 REQUEST_TIMEOUT = 10  # 10 seconds
 
 
@@ -79,10 +80,19 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
 
             # Format validation errors for display
             error_messages = []
-            for err in details:
-                field = err.get("loc", ["unknown"])[-1]  # Get field name
-                msg = err.get("msg", "Invalid value")
-                error_messages.append(f"{field}: {msg}")
+            if isinstance(details, list):
+                for err in details:
+                    field = err.get("loc", ["unknown"])[-1]  # Get field name
+                    msg = err.get("msg", "Invalid value")
+                    error_messages.append(f"{field}: {msg}")
+            elif isinstance(details, dict):
+                missing_fields = details.get("missing_fields", [])
+                if missing_fields:
+                    error_messages.extend(
+                        f"{field}: champ obligatoire" for field in missing_fields
+                    )
+                elif "error" in details:
+                    error_messages.append(str(details["error"]))
 
             return {
                 "error": "validation",
@@ -168,6 +178,80 @@ def call_predict_api(inputs: dict[str, Any]) -> dict[str, Any]:
         return {"error": "unknown", "message": f"Erreur inattendue: {str(e)}"}
 
 
+def get_available_models() -> dict[str, Any]:
+    """
+    Fetch the list of available API models and the currently active one.
+
+    Returns:
+        Dictionary with either:
+        - Success: {"available_models": list[str], "active_model": str | None}
+        - Error: {"error": str, "message": str}
+    """
+    try:
+        response = requests.get(
+            MODELS_ENDPOINT,
+            timeout=REQUEST_TIMEOUT,
+            headers={"Accept": "application/json"},
+        )
+        response.raise_for_status()
+        return response.json()
+    except RequestException as e:
+        logger.error("Unable to fetch model list: %s", type(e).__name__)
+        return {
+            "error": "network",
+            "message": (
+                "Impossible de récupérer la liste des modèles."
+                " Vérifiez que l'API est démarrée."
+            ),
+        }
+
+
+def select_model(model_name: str) -> dict[str, Any]:
+    """
+    Ask the API to activate a different prediction model.
+
+    Args:
+        model_name: Model file stem to activate
+
+    Returns:
+        Dictionary with either:
+        - Success: {"status": "ok", "active_model": str, ...}
+        - Error: {"error": str, "message": str}
+    """
+    try:
+        response = requests.post(
+            f"{MODELS_ENDPOINT}/select",
+            json={"model_name": model_name},
+            timeout=REQUEST_TIMEOUT,
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+        )
+
+        if response.status_code == 200:
+            return response.json()
+
+        error_data = response.json() if response.text else {}
+        detail = error_data.get("detail", "Erreur serveur inconnue")
+        if isinstance(detail, dict):
+            detail = detail.get("error", "Erreur serveur inconnue")
+
+        return {
+            "error": "server",
+            "message": (
+                f"Impossible de changer de modèle vers '{model_name}': {detail}"
+            ),
+            "status_code": response.status_code,
+        }
+    except RequestException as e:
+        logger.error("Unable to change active model: %s", type(e).__name__)
+        return {
+            "error": "network",
+            "message": (
+                "Impossible de changer de modèle."
+                " Vérifiez que l'API est démarrée."
+            ),
+        }
+
+
 def is_success_response(response: dict[str, Any]) -> bool:
     """
     Check if API response is a success.
@@ -221,6 +305,7 @@ def set_api_url(url: str) -> None:
     Args:
         url: Base API URL (e.g., "http://localhost:8000")
     """
-    global API_URL, PREDICT_ENDPOINT
+    global API_URL, MODELS_ENDPOINT, PREDICT_ENDPOINT
     API_URL = url
     PREDICT_ENDPOINT = f"{API_URL}/predict"
+    MODELS_ENDPOINT = f"{API_URL}/models"
