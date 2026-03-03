@@ -172,12 +172,4 @@ réel de l'application.
 - L'API n'étant pas toujours lancée dans le même mode (local ou Compose), les
   dashboards peuvent nécessiter une adaptation légère selon le contexte.
 
-## Conclusion
 
-Le dashboard réalisé répond aux objectifs pédagogiques du brief :
-
-- il couvre l'applicatif, l'infrastructure et les conteneurs,
-- il permet d'observer le comportement de l'API sous charge,
-- il met en avant une métrique métier spécifique à l'application,
-- il constitue une base exploitable pour l'analyse de performance et
-  l'alerting futur.

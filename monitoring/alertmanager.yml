@@ -1,0 +1,17 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: discord-default
+  group_by: ["alertname", "service"]
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 2h
+
+receivers:
+  - name: discord-default
+    discord_configs:
+      - send_resolved: true
+        webhook_url_file: /etc/alertmanager/secrets/discord_webhook_url
+        title: '{{ template "discord.default.title" . }}'
+        message: '{{ template "discord.default.message" . }}'
