@@ -27,6 +27,8 @@ BriefML/
 │   └── mlflow.Dockerfile
 ├── monitoring/           # Configuration monitoring + dashboard Grafana
 │   ├── prometheus.yml
+│   ├── alerts.yml
+│   ├── alertmanager.yml
 │   └── grafana-dashboard.json
 ├── scripts/
 │   ├── start.py                # Lanceur de developpement local
@@ -127,7 +129,9 @@ La stack Docker Compose integre desormais :
 - MLflow
 - PostgreSQL
 - Prometheus
+- Alertmanager
 - Grafana
+- Uptime Kuma
 - node-exporter
 - cAdvisor
 
@@ -148,6 +152,13 @@ Lanceur pratique (demarre la stack, attend les endpoints et ouvre les interfaces
 ./scripts/start_monitoring.sh
 ```
 
+Ce script :
+
+- demarre toute la stack Docker Compose en arriere-plan
+- attend que les services critiques repondent
+- ouvre automatiquement les interfaces utiles de monitoring, d'affichage et d'alerting
+  (Grafana, Prometheus targets + alerts, Alertmanager, Uptime Kuma, API metrics, Streamlit, MLflow)
+
 Avec Locust :
 
 ```bash
@@ -160,7 +171,10 @@ Services exposes :
 - Streamlit : `http://localhost:8501`
 - MLflow UI : `http://localhost:5000`
 - Prometheus : `http://localhost:9090`
+- Prometheus Alerts : `http://localhost:9090/alerts`
+- Alertmanager : `http://localhost:9093`
 - Grafana : `http://localhost:3000`
+- Uptime Kuma : `http://localhost:3001`
 - node-exporter : `http://localhost:9100`
 - cAdvisor : `http://localhost:8080`
 - PostgreSQL (conteneur) : `localhost:5433`
@@ -220,6 +234,7 @@ docker compose down
 | `mlflow_artifacts` | Modeles logges, graphiques, CSV | Survit aux `docker-compose down` |
 | `prometheus_data` | Historique des series temporelles Prometheus | Survit aux `docker-compose down` |
 | `grafana_data` | Dashboards, datasources, preferences Grafana | Survit aux `docker-compose down` |
+| `uptime_kuma_data` | Sondes, utilisateurs et notifications Uptime Kuma | Survit aux `docker-compose down` |
 
 Pour supprimer les volumes (reset complet) :
 ```bash
@@ -255,6 +270,38 @@ Prometheus scrape 4 jobs :
 - `node-exporter`
 - `cadvisor`
 - `prometheus`
+
+Regles d'alerte Prometheus :
+
+- `HighErrorRate`
+- `HighLatencyP95`
+- `FastApiTargetDown`
+
+Ces regles sont chargees depuis :
+
+- `monitoring/alerts.yml`
+
+Le routage des alertes est assure par Alertmanager, configure dans :
+
+- `monitoring/alertmanager.yml`
+
+Chaîne d'alerte :
+
+- `Prometheus -> Alertmanager -> Discord`
+
+Alertmanager est expose sur :
+
+- `http://localhost:9093`
+
+Uptime Kuma ajoute une couche de monitoring de disponibilite "black-box" complementaire :
+
+- surveillance HTTP des endpoints critiques (`/health`, Grafana, Prometheus, MLflow, Alertmanager)
+- notifications configurees sonde par sonde
+- possibilité d'envoyer aussi des alertes vers Discord
+
+Uptime Kuma est expose sur :
+
+- `http://localhost:3001`
 
 Le dashboard Grafana versionne dans le repo se trouve ici :
 

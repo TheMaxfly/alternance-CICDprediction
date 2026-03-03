@@ -49,7 +49,9 @@ docker compose up -d --build
 wait_for_url "http://localhost:8000/health" "API"
 wait_for_url "http://localhost:8501/_stcore/health" "Streamlit"
 wait_for_url "http://localhost:9090/-/ready" "Prometheus"
+wait_for_url "http://localhost:9093/-/ready" "Alertmanager"
 wait_for_url "http://localhost:3000/api/health" "Grafana"
+wait_for_url "http://localhost:3001" "Uptime Kuma"
 wait_for_url "http://localhost:5000/health" "MLflow"
 
 if [ "$WITH_LOCUST" = true ]; then
@@ -66,8 +68,11 @@ fi
 echo "[monitoring] Opening useful URLs..."
 open_url "http://localhost:3000"
 open_url "http://localhost:9090/targets"
+open_url "http://localhost:9090/alerts"
+open_url "http://localhost:9093"
 open_url "http://localhost:8000/metrics"
 open_url "http://localhost:8501"
+open_url "http://localhost:3001"
 open_url "http://localhost:5000"
 
 if [ "$WITH_LOCUST" = true ]; then
@@ -80,9 +85,12 @@ cat <<EOF
 Useful URLs:
 - Grafana:    http://localhost:3000
 - Prometheus: http://localhost:9090/targets
+- Alerts:     http://localhost:9090/alerts
+- Alertmgr:   http://localhost:9093
 - API health: http://localhost:8000/health
 - API metrics:http://localhost:8000/metrics
 - Streamlit:  http://localhost:8501
+- UptimeKuma: http://localhost:3001
 - MLflow:     http://localhost:5000
 EOF
 
