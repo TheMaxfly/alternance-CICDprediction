@@ -1,0 +1,43 @@
+groups:
+  - name: briefml-api-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: |
+          100 * (
+            (sum(rate(prediction_http_errors_total[5m])) or vector(0))
+            /
+            clamp_min((sum(rate(prediction_requests_total[5m])) or vector(0)), 1)
+          ) > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "Taux d'erreur eleve sur l'API de prediction"
+          description: "Le taux d'erreur depasse 5% depuis au moins 2 minutes."
+
+      - alert: HighLatencyP95
+        expr: |
+          (
+            histogram_quantile(
+              0.95,
+              sum(rate(prediction_request_duration_seconds_bucket[5m])) by (le)
+            ) or vector(0)
+          ) > 0.2
+        for: 2m
+        labels:
+          severity: warning
+          service: api
+        annotations:
+          summary: "Latence P95 elevee sur l'API de prediction"
+          description: "La latence P95 depasse 200 ms depuis au moins 2 minutes."
+
+      - alert: FastApiTargetDown
+        expr: up{job="fastapi"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: api
+        annotations:
+          summary: "La target fastapi est indisponible"
+          description: "Prometheus ne parvient plus a scraper la target fastapi."
