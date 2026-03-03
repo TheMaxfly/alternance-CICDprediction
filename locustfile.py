@@ -1,6 +1,5 @@
 from locust import HttpUser, between, task
 
-
 VALID_PAYLOAD = {
     "data": {
         "dep": "59",

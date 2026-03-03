@@ -28,7 +28,6 @@ import numpy as np
 import pandas as pd
 from catboost import CatBoostClassifier
 from fastapi import FastAPI, HTTPException, Response
-from pydantic import BaseModel, Field
 from prometheus_client import (
     CONTENT_TYPE_LATEST,
     Counter,
@@ -36,6 +35,7 @@ from prometheus_client import (
     Histogram,
     generate_latest,
 )
+from pydantic import BaseModel, Field
 
 # -----------------------------
 # Config / Meta
@@ -47,12 +47,8 @@ MODEL_DIR = BASE_DIR / "model"
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 DEFAULT_MODEL_NAME = "catboost_product15_v2_time_bucket_final"
 
-DEFAULT_MODEL_PATH = str(
-    MODEL_DIR / f"{DEFAULT_MODEL_NAME}.cbm"
-)
-DEFAULT_META_PATH = str(
-    ARTIFACTS_DIR / f"{DEFAULT_MODEL_NAME}_meta.json"
-)
+DEFAULT_MODEL_PATH = str(MODEL_DIR / f"{DEFAULT_MODEL_NAME}.cbm")
+DEFAULT_META_PATH = str(ARTIFACTS_DIR / f"{DEFAULT_MODEL_NAME}_meta.json")
 MISSING_CAT = os.getenv("MISSING_CAT", "__MISSING__")
 
 APP_START_TIME = time.time()

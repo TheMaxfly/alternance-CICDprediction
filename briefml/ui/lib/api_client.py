@@ -246,8 +246,7 @@ def select_model(model_name: str) -> dict[str, Any]:
         return {
             "error": "network",
             "message": (
-                "Impossible de changer de modèle."
-                " Vérifiez que l'API est démarrée."
+                "Impossible de changer de modèle. Vérifiez que l'API est démarrée."
             ),
         }
 

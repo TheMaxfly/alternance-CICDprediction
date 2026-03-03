@@ -171,5 +171,3 @@ réel de l'application.
   changement de stratégie de nommage impose de mettre à jour les requêtes.
 - L'API n'étant pas toujours lancée dans le même mode (local ou Compose), les
   dashboards peuvent nécessiter une adaptation légère selon le contexte.
-
-
